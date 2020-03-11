@@ -3,6 +3,7 @@ module Tildeconfig
         def initialize
             @deps = []
             @root_dir = nil
+            @install_dir = nil
             @files = []
             @install_cmds = []
             @uninstall_cmds = []
@@ -26,7 +27,18 @@ module Tildeconfig
 
         # file is also a "base" command
         def root_dir(dir)
-            @root_dir = dir
+            if dir.nil?
+                @root_dir = '.'
+            else
+                @root_dir = dir
+            end
+        end
+        def install_dir(dir)
+            if dir.nil?
+                @install_dir = '.'
+            else
+                @install_dir = dir
+            end
         end
         def file(src, dest=nil)
             if dest == nil
@@ -35,7 +47,24 @@ module Tildeconfig
             file_tuple = TildeFile.new(src, dest)
             # used for back-propogation
             @files.push(file_tuple)
-            # TODO: also insert install/uninstall/update commands
+
+            install do
+                run_file_install file_tuple
+            end
+            uninstall do
+                run_file_uninstall file_tuple
+            end
+            update do
+                run_file_install file_tuple
+            end
+        end
+
+        ### Methods defining file behavior. This should probably be moved into a separate file
+        def run_file_install(file_tuple)
+            # TODO
+        end
+        def run_file_uninstall(file_tuple)
+            # TODO
         end
 
         # def_pkg is defined as a class method for modifying the TildeMod class.
