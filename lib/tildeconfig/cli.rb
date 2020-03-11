@@ -2,7 +2,7 @@ module Tildeconfig
   CONFIG_FILE_NAME = "tildeconfig"
 
   module CLI
-    def run
+    def self.run
       if !File.exist?(CONFIG_FILE_NAME)
         $stderr.puts "Failed to find config file #{CONFIG_FILE_NAME}"
         return
