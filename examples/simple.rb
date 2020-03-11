@@ -7,7 +7,7 @@ mod :home do
     end
 end
 
-def_installer :ubuntu |pkgs| do
+def_installer :ubuntu do |pkgs|
     sh "sudo apt install #{pkgs.join(" ")}"
 end
 
@@ -22,7 +22,7 @@ end
 
 mod :all => [:home, :python_packages]
 
-def_cmd pip_req |m, *pkgs| do
+def_cmd :pip_req do |m, *pkgs|
     m.pkg_dep "python"
     m.install do
         sh "pip install #{pkgs.join(" ")}"
