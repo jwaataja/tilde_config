@@ -1,4 +1,7 @@
 module Tildeconfig
+    ##
+    # Object representing a module in tilde.config. Holds actions, files and dependencies specified
+    # for the module.
     class TildeMod
         def initialize
             @deps = []
@@ -10,16 +13,30 @@ module Tildeconfig
             @update_cmds = []
         end
 
+        ##
+        # Run the given block as part of this module's install action.
+        #
+        # The block will be given 0 arguments, and run in this module's context.
         def install(&block)
             # install must be passed a block
             raise "missing block argument" unless block_given?
             # make a storeable lambda with the passed in block
             @install_cmds.push(lambda(&block))
         end
+
+        ##
+        # Run the given block as part of this module's uninstall action.
+        #
+        # The block will be given 0 arguments, and run in this module's context.
         def uninstall(&block)
             raise "missing block argument" unless block_given?
             @uninstall_cmds.push(lambda(&block))
         end
+
+        ##
+        # Run the given block as part of this module's update action.
+        #
+        # The block will be given 0 arguments, and run in this module's context.
         def update(&block)
             raise "missing block argument" unless block_given?
             @update_cmds.push(lambda(&block))
