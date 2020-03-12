@@ -1,22 +1,27 @@
 require 'tildeconfig'
+require 'tempfile'
 
 describe Tildeconfig::TildeMod do
     it "exists, and has basic methods" do
-        x = Tildeconfig::TildeMod.new
-        x.install do
+        m = Tildeconfig::TildeMod.new
+        m.install do
             print "no-op"
         end
-        x.uninstall do
+        m.uninstall do
             print "no-op"
         end
-        x.update do
+        m.update do
             print "no-op"
         end
+        expect(m.install_cmds.length).to eq(1)
+        expect(m.uninstall_cmds.length).to eq(1)
+        expect(m.update_cmds.length).to eq(1)
     end
     it "allows both types of file invocations" do
-        x = Tildeconfig::TildeMod.new
-        x.file "source"
-        x.file "source2" "destination2"
+        m = Tildeconfig::TildeMod.new
+        m.file "source"
+        m.file "source2" "destination2"
+        expect(m.install_cmds.length).to eq(2)
     end
     it "can define custom methods" do
         # surely a smarter way to do this?
@@ -43,5 +48,44 @@ describe Tildeconfig::TildeMod do
         m = Tildeconfig::TildeMod.new
         expect(m).to receive(:install)
         m.my_method
+    end
+
+    describe "Installing files" do
+        it "one-arg syntax works" do
+            m = Tildeconfig::TildeMod::new
+
+            Dir.mktmpdir() do |dir|
+                src_dir = File.join dir, "source"
+                dst_dir = File.join dir, "dest"
+                src_file = File.join src_dir, "filea"
+                dst_file = File.join dst_dir, "filea"
+                Dir.mkdir src_dir
+                Dir.mkdir dst_dir
+                File.write src_file, "some contents"
+                m.root_dir src_dir
+                m.install_dir dst_dir
+                m.file "filea"
+                m.execute_install
+                expect(FileUtils.identical? src_file, dst_file).to be(true)
+            end
+        end
+        it "two-arg syntax works" do
+            m = Tildeconfig::TildeMod::new
+
+            Dir.mktmpdir() do |dir|
+                src_dir = File.join dir, "source"
+                dst_dir = File.join dir, "dest"
+                src_file = File.join src_dir, "filea"
+                dst_file = File.join dst_dir, "fileb"
+                Dir.mkdir src_dir
+                Dir.mkdir dst_dir
+                File.write src_file, "some other contents"
+                m.root_dir src_dir
+                m.install_dir dst_dir
+                m.file "filea", "fileb"
+                m.execute_install
+                expect(FileUtils.identical? src_file, dst_file).to be(true)
+            end
+        end
     end
 end
