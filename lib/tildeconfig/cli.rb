@@ -12,17 +12,17 @@ module Tildeconfig
 
       load(CONFIG_FILE_NAME)
 
-      parser = OptionsParser.new
-      options = parser.parse(ARGV)
+      options = Options.new.parse(ARGV)
       if ARGV.empty?
-          puts parser.parser
-          exit
+        options.print_help
+        exit
       end
 
-      command = ARGV[1]
+      command = ARGV[0]
       case command
       when "install"
-        MODULES.each do |m|
+        MODULES.each do |name, m|
+          puts "Installing #{name.to_s}"
           m.execute_install
         end
       else

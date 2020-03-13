@@ -28,29 +28,29 @@ module Tildeconfig
         exit
       end
       # Another typical switch to print the version.
-      parser.on_tail("--version", "Show version") do
+      parser.on_tail("-v", "--version", "Show version") do
         puts VERSION
         exit
       end
     end
-  end
 
-  def self.parser
-    options = Options.new
-    options.define_options(parser)
+    def self.parser
+      options = Options.new
+      options.define_options(parser)
 
-  end
+    end
 
-  ##
-  # Parses the given arguments, stores them, and returns the options.
-  def parse(args)
-    @parser.parse!(args)
-    self
-  end
+    ##
+    # Parses the given arguments, stores them, and returns the options.
+    def parse(args)
+      @parser.parse!(args)
+      self
+    end
 
-  ##
-  # Prints the help message for the command line program.
-  def print_help
-    puts @parser
+    ##
+    # Prints the help message for the command line program.
+    def print_help
+      puts @parser
+    end
   end
 end
