@@ -4,10 +4,11 @@ module Tildeconfig
   ##
   # Stores the options for the current run of the program.
   class Options
-    attr_accessor :interactive
+    attr_accessor :interactive, :system
 
     def initialize
       self.interactive = true
+      self.system = nil
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -21,6 +22,10 @@ module Tildeconfig
       parser.on("-n", "--non-interactive",
                 "Automatically accept prompts") do
         self.interactive = false
+      end
+      parser.on("-s", "--system SYSTEM",
+                "Set which system installer to use") do |s|
+        self.system = s
       end
 
       parser.on_tail("-h", "--help", "Show this message") do
@@ -51,6 +56,15 @@ module Tildeconfig
     # Prints the help message for the command line program.
     def print_help
       puts @parser
+    end
+
+    ## 
+    # Checks that all provided options are valid. Rasises an
+    # +OptionsError+ when given invalid options.
+    def validate
+      if @system && !Globals::INSTALLERS.key?(@system)
+        raise OptionsError.new("Unknown system #{system}", self)
+      end
     end
   end
 end

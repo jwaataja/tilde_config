@@ -13,6 +13,10 @@ module Tildeconfig
       load(CONFIG_FILE_NAME)
 
       options = Options.new.parse(ARGV)
+      unless options.validate
+        exit
+      end
+
       if ARGV.empty?
         options.print_help
         exit
@@ -21,35 +25,55 @@ module Tildeconfig
       command = ARGV[0]
       case command
       when "install"
-        MODULES.each do |name, m|
-          puts "Installing #{name.to_s}"
-          succeeded = m.execute_install
-          unless succeeded
-            warn "Error while installing #{name}"
-            exit false
-          end
-        end
+        install(options)
       when "uninstall"
-        MODULES.each do |name, m|
-          puts "Uninstalling #{name.to_s}"
-          succeeded = m.execute_uninstall
-          unless succeeded
-            warn "Error while updating #{name}"
-            exit false
-          end
-        end
+        uninstall(options)
       when "update"
-        MODULES.each do |name, m|
-          puts "Updating #{name.to_s}"
-          succeeded = m.execute_update
-          unless succeeded
-            warn "Error while updating #{name}"
-            exit false
-          end
-        end
+        update(options)
       else
-          puts "Unknown command #{command}"
+        puts "Unknown command #{command}"
       end
     end
+  end
+
+  def self.install(options)
+    succeeded = true
+    Globals::MODULES.each do |name, m|
+      puts "Installing #{name.to_s}"
+      begin
+        m.execute_install
+      rescue FileInstallError => e
+        warn "Error while installing module #{name}."
+        warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+          "#{e.message}"
+        succeeded = false
+      end
+      exit false unless succeeded
+    end
+
+  end
+
+  def self.uninstall(options)
+    Globals::MODULES.each do |name, m|
+      puts "Uninstalling #{name.to_s}"
+      m.execute_uninstall
+    end
+  end
+
+  def self.update(options)
+    succeeded = true
+    Globals::MODULES.each do |name, m|
+      puts "Updating #{name.to_s}"
+      begin
+        succeeded = m.execute_update
+      rescue FileInstallError => e
+        warn "Error while updating module #{name}."
+        warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+          "#{e.message}"
+        succeeded = false
+      end
+      exit false unless succeeded
+    end
+
   end
 end

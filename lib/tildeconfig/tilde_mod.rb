@@ -7,9 +7,7 @@ module Tildeconfig
   class TildeMod
     DEFAULT_INSTALL_DIR = Dir.home
 
-    # utility tuple-like class
-    TildeFile = Struct.new(:src, :dest)
-    private_constant :DEFAULT_INSTALL_DIR, :TildeFile
+    private_constant :DEFAULT_INSTALL_DIR
 
     attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files
 
@@ -71,28 +69,25 @@ module Tildeconfig
     end
 
     ##
-    # Execute the install action for this module now. Returns true on success,
-    # false on failure.
+    # Execute the install action for this module now. Raises +FileInstallError+
+    # when a file fails to install.
     def execute_install
-      @files.each { |file| return false unless run_file_install(file) }
+      @files.each { |file| run_file_install(file) }
       install_cmds.each(&:call)
-      true
     end
 
     ##
-    # Execute the uninstall action for this module now. Returns true on success,
-    # false on failure.
+    # Execute the uninstall action for this module now.
     def execute_uninstall
-      files.each { |file| return false unless run_file_uninstall(file) }
+      files.each { |file| run_file_uninstall(file) }
       uninstall_cmds.each(&:call)
-      true
     end
 
     ##
-    # Execute the update action for this module now. Returns true on success,
-    # false on failure.
+    # Execute the update action for this module now. Raises +FileInstallError+
+    # when a file failes to install.
     def execute_update
-      files.each { |file| return false unless run_file_install(file) }
+      files.each { |file| run_file_install(file) }
       update_cmds.each(&:call)
     end
 
@@ -117,30 +112,27 @@ module Tildeconfig
     private
 
     ##
-    # Method run to install a file. Used by TildeMod.file. Returns true on
-    # success, false on failure.
+    # Method run to install a file. Used by TildeMod.file. Rasises an
+    # +FileInstallError+ on failure.
     def run_file_install(file_tuple)
       # TODO: this assumes that our working directory will always be the user's
       # settings repository.
       src = File.join(@root_dir, file_tuple.src)
       dest = File.join(@install_dir, file_tuple.dest)
       unless File.exists?(src)
-        warn "missing source file #{src}"
-        return false
+        raise InstallError.new("missing source file #{src}", file_tuple)
       end
       if File.exists?(dest) && File.directory?(dest)
-        warn "can't install to non-directory #{dest}"
-        return false
+        raise InstallError.new("can't install to non-directory #{dest}",
+                               file_tuple)
       end
-      FileUtils.mkdir_p(dest)
+      FileUtils.mkdir_p(File.dirname(dest))
       puts "Copying #{src} to #{dest}"
       FileUtils.cp(src, dest)
-      true
     end
 
     ##
-    # Method run to uninstall a file. Used by TildeMod.file. Returns true on
-    # success, false on failure.
+    # Method run to uninstall a file. Used by TildeMod.file.
     def run_file_uninstall(file_tuple)
       dest = File.join(@install_dir, file_tuple.dest)
       FileUtils.rm(dest) if ask_yes_no("Delete #{dest}? [y/N] ")
