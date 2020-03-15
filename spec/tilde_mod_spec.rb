@@ -21,7 +21,7 @@ describe Tildeconfig::TildeMod do
         m = Tildeconfig::TildeMod.new
         m.file "source"
         m.file "source2" "destination2"
-        expect(m.install_cmds.length).to eq(2)
+        expect(m.files.size).to eq(2)
     end
     it "can define custom methods" do
         # surely a smarter way to do this?

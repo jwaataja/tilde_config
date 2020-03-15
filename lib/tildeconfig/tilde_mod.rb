@@ -1,15 +1,19 @@
+
+
 module Tildeconfig
   ##
   # Object representing a module in tilde.config. Holds actions, files and
   # dependencies specified for the module.
   class TildeMod
     DEFAULT_INSTALL_DIR = Dir.home
+
     # utility tuple-like class
     TildeFile = Struct.new(:src, :dest)
     private_constant :DEFAULT_INSTALL_DIR, :TildeFile
 
+    attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files
+
     def initialize
-      @deps = []
       @root_dir = "."
       @install_dir = DEFAULT_INSTALL_DIR
       @files = []
@@ -26,7 +30,7 @@ module Tildeconfig
       # install must be passed a block
       raise "missing block argument" unless block_given?
       # make a storeable lambda with the passed in block
-      @install_cmds.push(block)
+      @install_cmds << block
     end
 
     ##
@@ -35,7 +39,7 @@ module Tildeconfig
     # The block will be given 0 arguments, and run in this module's context.
     def uninstall(&block)
       raise "missing block argument" unless block_given?
-      @uninstall_cmds.push(block)
+      @uninstall_cmds << block
     end
 
     ##
@@ -44,7 +48,7 @@ module Tildeconfig
     # The block will be given 0 arguments, and run in this module's context.
     def update(&block)
       raise "missing block argument" unless block_given?
-      @update_cmds.push(block)
+      @update_cmds << block
     end
 
     ##
@@ -67,38 +71,28 @@ module Tildeconfig
     end
 
     ##
-    # Get all commands to be executed as part of the install action.
-    def install_cmds
-      @install_cmds
-    end
-
-    ##
-    # Get all commands to be executed as part of the uninstall action.
-    def uninstall_cmds
-      @uninstall_cmds
-    end
-
-    ##
-    # Get all commands to be executed as part of the update action.
-    def update_cmds
-      @update_cmds
-    end
-
-    ##
-    # Execute the install action for this module now.
+    # Execute the install action for this module now. Returns true on success,
+    # false on failure.
     def execute_install
+      @files.each { |file| return false unless run_file_install(file) }
       install_cmds.each(&:call)
+      true
     end
 
     ##
-    # Execute the uninstall action for this module now.
+    # Execute the uninstall action for this module now. Returns true on success,
+    # false on failure.
     def execute_uninstall
+      files.each { |file| return false unless run_file_uninstall(file) }
       uninstall_cmds.each(&:call)
+      true
     end
 
     ##
-    # Execute the update action for this module now.
+    # Execute the update action for this module now. Returns true on success,
+    # false on failure.
     def execute_update
+      files.each { |file| return false unless run_file_install(file) }
       update_cmds.each(&:call)
     end
 
@@ -107,21 +101,11 @@ module Tildeconfig
     # then it will be used for both source and destination. Source is relative
     # to repository root, or set root_dir. Destination is relative to home
     # directory, or dir set by install_dir.
-    def file(src, dest=nil)
+    def file(src, dest = nil)
       dest = src if dest == nil
       file_tuple = TildeFile.new(src, dest)
       # used for back-propogation
-      @files.push(file_tuple)
-
-      install do
-        run_file_install(file_tuple)
-      end
-      uninstall do
-        run_file_uninstall(file_tuple)
-      end
-      update do
-        run_file_install(file_tuple)
-      end
+      @files << file_tuple
     end
 
     # def_pkg is defined as a class method for modifying the TildeMod class.
@@ -134,41 +118,40 @@ module Tildeconfig
     private
 
     ##
-    # Method run to install a file. Used by TildeMod.file.
+    # Method run to install a file. Used by TildeMod.file. Returns true on
+    # success, false on failure.
     def run_file_install(file_tuple)
       # TODO: this assumes that our working directory will always be the user's
       # settings repository.
       src = File.join(@root_dir, file_tuple.src)
       dest = File.join(@install_dir, file_tuple.dest)
-      unless File.exist? src
-        raise "missing source file #{src}"
+      unless File.exists?(src)
+        warn "missing source file #{src}"
+        return false
       end
-      if File.exists? dest and !File.file? dest
-        raise "destination file #{dest} exists and is not a regular file"
+      if File.exists?(dest) && File.directory?(dest)
+        warn "can't install to non-directory #{dest}"
+        return false
       end
-      puts "copying #{src} to #{dest}"
-      File.open(src, 'r') do |src_stream|
-        File.open(dest, 'w+') do |dest_stream|
-          FileUtils.copy_stream src_stream, dest_stream
-        end
-      end
+      puts "Copying #{src} to #{dest}"
+      FileUtils.cp(src, dest)
+      true
     end
 
     ##
-    # Method run to uninstall a file. Used by TildeMod.file.
+    # Method run to uninstall a file. Used by TildeMod.file. Returns true on
+    # success, false on failure.
     def run_file_uninstall(file_tuple)
-      dest = File.join @install_dir, file_tuple.dest
-      if ask_yes_no "Delete #{dest}? [y/N] "
-        FileUtils.rm dest
-      end
+      dest = File.join(@install_dir, file_tuple.dest)
+      FileUtils.rm(dest) if ask_yes_no("Delete #{dest}? [y/N] ")
       # remove empty directories
       dir = dest
       loop do
         # grab dir's parent
         dir = File.split(dir)[0]
-        if Dir.empty? dir
+        if Dir.empty?(dir)
           puts "Removing empty directory #{dir}"
-          Dir.delete dir
+          Dir.delete(dir)
         end
       end
     end
@@ -177,9 +160,9 @@ module Tildeconfig
     # Make a repeating prompt for Y/n answer, with an empty answer defaulting to
     # no.  Returns true on yes, false on no or empty answer.
     def ask_yes_no(prompt)
-      while true
+      loop do
         print prompt
-        res = gets
+        res = gets.chomp
         if res.start_with?(/yY/)
           return true
         elsif res.start_with?(/nN/) || res.strip.empty?

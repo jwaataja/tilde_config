@@ -1,3 +1,3 @@
 module Tildeconfig
-  MODULES = Hash.new
+  MODULES = {}
 end

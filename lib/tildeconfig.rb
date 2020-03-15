@@ -1,5 +1,5 @@
 require "tildeconfig/version"
-require "tildeconfig/tildemod"
+require "tildeconfig/tilde_mod"
 require "tildeconfig/cli"
 require "tildeconfig/options"
 require "tildeconfig/modules"
