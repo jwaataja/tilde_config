@@ -4,11 +4,12 @@ module Tildeconfig
   ##
   # Stores the options for the current run of the program.
   class Options
-    attr_accessor :interactive, :system
+    attr_accessor :interactive, :system, :packages
 
     def initialize
       self.interactive = true
       self.system = nil
+      self.packages = false
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -26,6 +27,15 @@ module Tildeconfig
       parser.on('-s', '--system SYSTEM',
                 'Set which system installer to use') do |s|
         self.system = s.to_sym
+      end
+      parser.on('--print-systems',
+                'Print out the available systems with installers') do
+        Globals::INSALLERS.each_key { |name| puts name }
+        exit
+      end
+      parser.on('-p', '--packages',
+                'Attempt to install system package dependencies') do
+        self.packages = true
       end
 
       parser.on_tail('-h', '--help', 'Show this message') do
@@ -56,6 +66,13 @@ module Tildeconfig
     # Checks that all provided options are valid. Rasises an
     # +OptionsError+ when given invalid options.
     def validate
+      if @packages && !@system
+        raise OptionsError.new(
+          'Must proved system when installing packages with --packages',
+          self
+        )
+      end
+
       if @system && !Globals::INSTALLERS.key?(@system)
         raise OptionsError.new("Unknown system #{system}", self)
       end

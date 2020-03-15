@@ -45,7 +45,7 @@ module Tildeconfig
       Globals::MODULES.each do |name, m|
         puts "Installing #{name}"
         begin
-          m.execute_install
+          m.execute_install(options)
         rescue FileInstallError => e
           warn "Error while installing module #{name}."
           warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \

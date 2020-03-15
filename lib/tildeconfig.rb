@@ -1,6 +1,7 @@
 require 'tildeconfig/version'
 require 'tildeconfig/tilde_file'
 require 'tildeconfig/options_error'
+require 'tildeconfig/package_install_error'
 require 'tildeconfig/file_install_error'
 require 'tildeconfig/tilde_mod'
 require 'tildeconfig/options'

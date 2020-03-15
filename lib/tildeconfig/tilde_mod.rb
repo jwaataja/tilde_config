@@ -1,4 +1,4 @@
-
+require 'set'
 
 module Tildeconfig
   ##
@@ -19,6 +19,7 @@ module Tildeconfig
       @install_cmds = []
       @uninstall_cmds = []
       @update_cmds = []
+      @package_dependencies = Set.new
     end
 
     ##
@@ -29,7 +30,6 @@ module Tildeconfig
       # install must be passed a block
       raise 'missing block argument' unless block_given?
 
-      # make a storeable lambda with the passed in block
       @install_cmds << block
     end
 
@@ -73,9 +73,16 @@ module Tildeconfig
     end
 
     ##
+    # Adds the given package as a dependency for this module.
+    def pkg_dep(package)
+      @package_dependencies << package
+    end
+
+    ##
     # Execute the install action for this module now. Raises +FileInstallError+
     # when a file fails to install.
-    def execute_install
+    def execute_install(options)
+      install_dependencies if options.packages
       @files.each { |file| run_file_install(file) }
       install_cmds.each(&:call)
     end
@@ -165,6 +172,37 @@ module Tildeconfig
 
         puts "Please answer 'y' or 'n'."
       end
+    end
+
+    ##
+    # Installs all package denpendencies. Prints a warning to the user if
+    # there's that hasn't been definde with +def_package+. Rasises an
+    # +PackageInstallError+ if any fail to install.
+    def install_dependencies(options)
+      system = options.system
+      package_names = @package_dependencies.map do |package|
+        find_package_name(package, system)
+      end
+      unless Globals::INSTALLERS[system].install(package_names)
+        raise PackageInstallError, 'Failed to install package(s) ' \
+          "#{package_names.join(', ')} for system #{system}"
+      end
+    end
+
+    ##
+    # Returns the package name for +package+ on +system+. If +package+ has no
+    # +def_package+ or the package has no name on +system+, then returns
+    # +package+ itself. In this case prints a warning to the user.
+    def find_package_name(package, system)
+      unless Globals::SYSTEM_PACKAGES.key?(package)
+        puts %(Warning: package #{package} has no "def_package")
+        return package
+      end
+      unless Globals::SYSTEM_PACKAGES.fetch(package).on_system?(system)
+        puts "Warning: package #{package} is not on system #{system}"
+        return package
+      end
+      Globals::SYSTEM_PACKAGES.fetch(package).name_for_system(system)
     end
   end
 end

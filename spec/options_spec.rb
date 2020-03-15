@@ -26,6 +26,11 @@ describe Options do
     Options.new.parse(%w[-n --system ubuntu])
   end
 
+  it 'should detect when --packages is given without --system' do
+    options = Options.new.parse(%w[--packages])
+    expect { options.validate }.to raise_error(OptionsError)
+  end
+
   it 'validate should detect invalid systems' do
     options = Options.new.parse(%w[--system fake-system])
     expect { options.validate }.to raise_error(OptionsError)
