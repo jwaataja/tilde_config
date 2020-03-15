@@ -104,7 +104,6 @@ module Tildeconfig
     def file(src, dest = nil)
       dest = src if dest == nil
       file_tuple = TildeFile.new(src, dest)
-      # used for back-propogation
       @files << file_tuple
     end
 
@@ -133,6 +132,7 @@ module Tildeconfig
         warn "can't install to non-directory #{dest}"
         return false
       end
+      FileUtils.mkdir_p(dest)
       puts "Copying #{src} to #{dest}"
       FileUtils.cp(src, dest)
       true
