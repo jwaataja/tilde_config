@@ -7,8 +7,12 @@ module Tildeconfig
     MODULES = {}
 
     ##
-    # Map from system names as strings to the +PackageInstaller+ for that
+    # Map from system names as symbols to the +PackageInstaller+ for that
     # system.
     INSTALLERS = {}
+
+    ##
+    # Map from package names as strings to the +SystemPackage+ for it.
+    SYSTEM_PACKAGES = {}
   end
 end

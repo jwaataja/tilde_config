@@ -25,7 +25,7 @@ module Tildeconfig
       end
       parser.on("-s", "--system SYSTEM",
                 "Set which system installer to use") do |s|
-        self.system = s
+        self.system = s.to_sym
       end
 
       parser.on_tail("-h", "--help", "Show this message") do
