@@ -120,11 +120,11 @@ module Tildeconfig
       src = File.join(@root_dir, file_tuple.src)
       dest = File.join(@install_dir, file_tuple.dest)
       unless File.exists?(src)
-        raise InstallError.new("missing source file #{src}", file_tuple)
+        raise FileInstallError.new("missing source file #{src}", file_tuple)
       end
       if File.exists?(dest) && File.directory?(dest)
-        raise InstallError.new("can't install to non-directory #{dest}",
-                               file_tuple)
+        raise FileInstallError.new("can't install to non-directory #{dest}",
+                                   file_tuple)
       end
       FileUtils.mkdir_p(File.dirname(dest))
       puts "Copying #{src} to #{dest}"
