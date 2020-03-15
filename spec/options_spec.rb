@@ -23,7 +23,9 @@ describe Options do
   end
 
   it 'should successfully validate valid options' do
-    Options.new.parse(%w[-n --system ubuntu]).validate
+    Configuration.with_standard_library do
+      Options.new.parse(%w[-n --system ubuntu]).validate
+    end
   end
 
   it 'should detect when --packages is given without --system' do

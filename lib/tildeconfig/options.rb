@@ -30,7 +30,8 @@ module Tildeconfig
       end
       parser.on('--print-systems',
                 'Print out the available systems with installers') do
-        Globals::INSTALLERS.each_key { |name| puts name }
+        config = Configuration.instance
+        config.installers.each_key { |name| puts name }
         exit
       end
       parser.on('-p', '--packages',
@@ -73,7 +74,8 @@ module Tildeconfig
         )
       end
 
-      if @system && !Globals::INSTALLERS.key?(@system)
+      config = Configuration.instance
+      if @system && !config.installers.key?(@system)
         raise OptionsError.new("Unknown system #{system}", self)
       end
     end

@@ -12,6 +12,7 @@ module Tildeconfig
         exit
       end
 
+      define_standard_library
       load(CONFIG_FILE_NAME)
 
       options = Options.new.parse(ARGV)
@@ -42,7 +43,7 @@ module Tildeconfig
 
     def self.install(options)
       succeeded = true
-      Globals::MODULES.each do |name, m|
+      Configuration.instance.modules.each do |name, m|
         puts "Installing #{name}"
         begin
           m.execute_install(options)
@@ -57,7 +58,7 @@ module Tildeconfig
     end
 
     def self.uninstall(options)
-      Globals::MODULES.each do |name, m|
+      Configuration.instance.modules.each do |name, m|
         puts "Uninstalling #{name}"
         m.execute_uninstall
       end
@@ -65,7 +66,7 @@ module Tildeconfig
 
     def self.update(options)
       succeeded = true
-      Globals::MODULES.each do |name, m|
+      Configuration.instance.modules.each do |name, m|
         puts "Updating #{name}"
         begin
           succeeded = m.execute_update

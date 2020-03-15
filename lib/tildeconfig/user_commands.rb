@@ -2,11 +2,12 @@
 # Defines a module with the given name if it doesn't already exist. If a block
 # is provided, runs it and passes the module with the given name.
 def mod(name)
-  unless Tildeconfig::Globals::MODULES.key?(name)
-    Tildeconfig::Globals::MODULES[name] = Tildeconfig::TildeMod.new
+  config = Tildeconfig::Configuration.instance
+  unless config.modules.key?(name)
+    config.modules[name] = Tildeconfig::TildeMod.new(name)
   end
 
-  yield(Tildeconfig::Globals::MODULES[name]) if block_given?
+  yield(config.modules[name]) if block_given?
 end
 
 ##
@@ -20,8 +21,8 @@ end
 # installer yields to the provided block passing an array of packages. Overrides
 # existing installers with the same name.
 def def_installer(name, &block)
-  Tildeconfig::Globals::INSTALLERS[name.to_sym] =
-    Tildeconfig::PackageInstaller.new(&block)
+  config = Tildeconfig::Configuration.instance
+  config.installers[name.to_sym] = Tildeconfig::PackageInstaller.new(&block)
 end
 
 ##
@@ -29,7 +30,8 @@ end
 # parameter is a hash from symbols representing package names to strings
 # representing the name of the package on that system. Overrides existing
 # package if exists.
-def def_package(name, system_names)
-  Tildeconfig::Globals::SYSTEM_PACKAGES[name] =
+def def_package(name, system_names = {})
+  config = Tildeconfig::Configuration.instance
+  config.system_packages[name] =
     Tildeconfig::SystemPackage.new(name, system_names)
 end

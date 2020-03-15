@@ -9,10 +9,11 @@ module Tildeconfig
 
     private_constant :DEFAULT_INSTALL_DIR
 
-    attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files,
+    attr_reader :name, :install_cmds, :uninstall_cmds, :update_cmds, :files,
                 :package_dependencies
 
-    def initialize
+    def initialize(name)
+      @name = name
       @root_dir = '.'
       @install_dir = DEFAULT_INSTALL_DIR
       @files = []
@@ -74,8 +75,8 @@ module Tildeconfig
 
     ##
     # Adds the given package as a dependency for this module.
-    def pkg_dep(package)
-      @package_dependencies << package
+    def pkg_dep(*packages)
+      @package_dependencies.merge(packages)
     end
 
     ##
@@ -183,7 +184,8 @@ module Tildeconfig
       package_names = @package_dependencies.map do |package|
         find_package_name(package, system)
       end
-      unless Globals::INSTALLERS[system].install(package_names)
+      config = Configuration.instance
+      unless config.installers[system].install(package_names)
         raise PackageInstallError, 'Failed to install package(s) ' \
           "#{package_names.join(', ')} for system #{system}"
       end
@@ -194,15 +196,16 @@ module Tildeconfig
     # +def_package+ or the package has no name on +system+, then returns
     # +package+ itself. In this case prints a warning to the user.
     def find_package_name(package, system)
-      unless Globals::SYSTEM_PACKAGES.key?(package)
+      config = Configuration.instance
+      unless config.system_packages.key?(package)
         puts %(Warning: package #{package} has no "def_package")
         return package
       end
-      unless Globals::SYSTEM_PACKAGES.fetch(package).on_system?(system)
+      unless config.system_packages.fetch(package).on_system?(system)
         puts "Warning: package #{package} is not on system #{system}"
         return package
       end
-      Globals::SYSTEM_PACKAGES.fetch(package).name_for_system(system)
+      config.system_packages.fetch(package).name_for_system(system)
     end
   end
 end
