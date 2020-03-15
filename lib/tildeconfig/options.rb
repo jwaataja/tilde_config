@@ -15,34 +15,28 @@ module Tildeconfig
     end
 
     def define_options(parser)
-      parser.banner = "Usage: tildeconfig command [options]"
-      parser.separator ""
-      parser.separator "options:"
+      parser.banner = 'Usage: tildeconfig command [options]'
+      parser.separator('')
+      parser.separator('options:')
 
-      parser.on("-n", "--non-interactive",
-                "Automatically accept prompts") do
+      parser.on('-n', '--non-interactive',
+                'Automatically accept prompts') do
         self.interactive = false
       end
-      parser.on("-s", "--system SYSTEM",
-                "Set which system installer to use") do |s|
+      parser.on('-s', '--system SYSTEM',
+                'Set which system installer to use') do |s|
         self.system = s.to_sym
       end
 
-      parser.on_tail("-h", "--help", "Show this message") do
+      parser.on_tail('-h', '--help', 'Show this message') do
         puts parser
         exit
       end
       # Another typical switch to print the version.
-      parser.on_tail("-v", "--version", "Show version") do
+      parser.on_tail('-v', '--version', 'Show version') do
         puts VERSION
         exit
       end
-    end
-
-    def self.parser
-      options = Options.new
-      options.define_options(parser)
-
     end
 
     ##
@@ -58,7 +52,7 @@ module Tildeconfig
       puts @parser
     end
 
-    ## 
+    ##
     # Checks that all provided options are valid. Rasises an
     # +OptionsError+ when given invalid options.
     def validate

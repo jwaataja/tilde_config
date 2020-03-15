@@ -1,5 +1,4 @@
 module Tildeconfig
-
   ##
   # Represents a mechanism for installing packages on a given system.
   class PackageInstaller

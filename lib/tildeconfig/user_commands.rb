@@ -2,7 +2,7 @@
 # Defines a module with the given name if it doesn't already exist. If a block
 # is provided, runs it and passes the module with the given name.
 def mod(name)
-  if !Tildeconfig::Globals::MODULES.key?(name)
+  unless Tildeconfig::Globals::MODULES.key?(name)
     Tildeconfig::Globals::MODULES[name] = Tildeconfig::TildeMod.new
   end
 

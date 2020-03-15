@@ -1,4 +1,7 @@
 module Tildeconfig
+  ##
+  # Represents a software package that may be installed on an operating system,
+  # usually by a package manager.
   class SystemPackage
     attr_reader :name
 

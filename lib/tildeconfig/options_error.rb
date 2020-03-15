@@ -1,4 +1,6 @@
 module Tildeconfig
+  ##
+  # An error indicating invalid options.
   class OptionsError < StandardError
     attr_reader :options
 

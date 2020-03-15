@@ -10,10 +10,10 @@ module Tildeconfig
     private_constant :DEFAULT_INSTALL_DIR
 
     attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files,
-      :package_dependencies
+                :package_dependencies
 
     def initialize
-      @root_dir = "."
+      @root_dir = '.'
       @install_dir = DEFAULT_INSTALL_DIR
       @files = []
       @install_cmds = []
@@ -27,7 +27,8 @@ module Tildeconfig
     # The block will be given 0 arguments, and run in this module's context.
     def install(&block)
       # install must be passed a block
-      raise "missing block argument" unless block_given?
+      raise 'missing block argument' unless block_given?
+
       # make a storeable lambda with the passed in block
       @install_cmds << block
     end
@@ -37,7 +38,8 @@ module Tildeconfig
     #
     # The block will be given 0 arguments, and run in this module's context.
     def uninstall(&block)
-      raise "missing block argument" unless block_given?
+      raise 'missing block argument' unless block_given?
+
       @uninstall_cmds << block
     end
 
@@ -46,7 +48,8 @@ module Tildeconfig
     #
     # The block will be given 0 arguments, and run in this module's context.
     def update(&block)
-      raise "missing block argument" unless block_given?
+      raise 'missing block argument' unless block_given?
+
       @update_cmds << block
     end
 
@@ -54,7 +57,7 @@ module Tildeconfig
     # Set the root_dir for this module. All file source paths are relative to
     # the value set here. This is relative to the repository root.
     def root_dir(dir)
-      dir = "." if dir.nil?
+      dir = '.' if dir.nil?
       @root_dir = File.expand_path(dir)
     end
 
@@ -63,7 +66,7 @@ module Tildeconfig
     # the value set here. `~` in the argument is automatically expanded to the
     # user's home directory.
     def install_dir(dir)
-      dir = "~" if dir.nil?
+      dir = '~' if dir.nil?
       # expand relative to DEFAULT_INSTALL_DIR, not the current working
       # directory
       @install_dir = File.expand_path(dir, DEFAULT_INSTALL_DIR)
@@ -98,14 +101,14 @@ module Tildeconfig
     # to repository root, or set root_dir. Destination is relative to home
     # directory, or dir set by install_dir.
     def file(src, dest = nil)
-      dest = src if dest == nil
+      dest = src if dest.nil?
       file_tuple = TildeFile.new(src, dest)
       @files << file_tuple
     end
 
     # def_pkg is defined as a class method for modifying the TildeMod class.
     # It will later be added to global scope within scripts
-    def self.def_cmd(name, &block)
+    def self.def_cmd(name)
       # the given block should take in (module, *other_args)
       define_method(name, ->(*args) { yield self, *args })
     end
@@ -120,10 +123,11 @@ module Tildeconfig
       # settings repository.
       src = File.join(@root_dir, file_tuple.src)
       dest = File.join(@install_dir, file_tuple.dest)
-      unless File.exists?(src)
+      unless File.exist?(src)
         raise FileInstallError.new("missing source file #{src}", file_tuple)
       end
-      if File.exists?(dest) && File.directory?(dest)
+
+      if File.exist?(dest) && File.directory?(dest)
         raise FileInstallError.new("can't install to non-directory #{dest}",
                                    file_tuple)
       end
@@ -156,13 +160,10 @@ module Tildeconfig
       loop do
         print prompt
         res = gets.chomp
-        if res.start_with?(/yY/)
-          return true
-        elsif res.start_with?(/nN/) || res.strip.empty?
-          return false
-        else
-          puts "Please answer 'y' or 'n'."
-        end
+        return true if res.start_with?(/yY/)
+        return false if res.start_with?(/nN/) || res.strip.empty?
+
+        puts "Please answer 'y' or 'n'."
       end
     end
   end

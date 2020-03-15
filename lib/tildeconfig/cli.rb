@@ -1,11 +1,13 @@
 module Tildeconfig
-  CONFIG_FILE_NAME = "tildeconfig"
+  CONFIG_FILE_NAME = 'tildeconfig'
 
+  ##
+  # Methods for the tildeconfig command line interface.
   module CLI
     ##
     # Starts the main execution of the command line program.
     def self.run
-      if !File.exist?(CONFIG_FILE_NAME)
+      unless File.exist?(CONFIG_FILE_NAME)
         warn "Failed to find config file #{CONFIG_FILE_NAME}"
         exit
       end
@@ -27,11 +29,11 @@ module Tildeconfig
 
       command = ARGV[0]
       case command
-      when "install"
+      when 'install'
         install(options)
-      when "uninstall"
+      when 'uninstall'
         uninstall(options)
-      when "update"
+      when 'update'
         update(options)
       else
         puts "Unknown command #{command}"
@@ -41,7 +43,7 @@ module Tildeconfig
     def self.install(options)
       succeeded = true
       Globals::MODULES.each do |name, m|
-        puts "Installing #{name.to_s}"
+        puts "Installing #{name}"
         begin
           m.execute_install
         rescue FileInstallError => e
@@ -52,12 +54,11 @@ module Tildeconfig
         end
         exit false unless succeeded
       end
-
     end
 
     def self.uninstall(options)
       Globals::MODULES.each do |name, m|
-        puts "Uninstalling #{name.to_s}"
+        puts "Uninstalling #{name}"
         m.execute_uninstall
       end
     end
@@ -65,7 +66,7 @@ module Tildeconfig
     def self.update(options)
       succeeded = true
       Globals::MODULES.each do |name, m|
-        puts "Updating #{name.to_s}"
+        puts "Updating #{name}"
         begin
           succeeded = m.execute_update
         rescue FileInstallError => e

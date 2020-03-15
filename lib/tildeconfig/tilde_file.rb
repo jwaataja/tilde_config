@@ -1,4 +1,6 @@
 module Tildeconfig
+  ##
+  # A file that can be installed.
   class TildeFile
     attr_reader :src, :dest
 
