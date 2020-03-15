@@ -28,7 +28,8 @@ module Tildeconfig
 
     ##
     # Yields to the provided block with a temporary empty configuration. The
-    # global configuration is reset to its origin state afterward.
+    # global configuration is reset to its origin state afterward. Returns the
+    # result of the block.
     def self.with_empty_configuration
       old_configuration = instance
       self.instance = new
@@ -42,7 +43,8 @@ module Tildeconfig
     ##
     # Yields to the provided block with a temporary empty configuration. This
     # configuration will have standard library available. The global
-    # configuration is reset to its origin state afterward.
+    # configuration is reset to its origin state afterward. Returns the result
+    # of the block.
     def self.with_standard_library
       old_configuration = instance
       self.instance = new

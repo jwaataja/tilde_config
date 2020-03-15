@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require "tildeconfig"
+require 'tildeconfig'
 
-Tildeconfig::CLI.run
+exit Tildeconfig::CLI.run(ARGV)
