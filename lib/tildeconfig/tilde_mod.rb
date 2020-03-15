@@ -82,7 +82,7 @@ module Tildeconfig
     # Execute the install action for this module now. Raises +FileInstallError+
     # when a file fails to install.
     def execute_install(options)
-      install_dependencies if options.packages
+      install_dependencies(options) if options.packages
       @files.each { |file| run_file_install(file) }
       install_cmds.each(&:call)
     end

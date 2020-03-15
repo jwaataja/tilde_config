@@ -30,7 +30,7 @@ module Tildeconfig
       end
       parser.on('--print-systems',
                 'Print out the available systems with installers') do
-        Globals::INSALLERS.each_key { |name| puts name }
+        Globals::INSTALLERS.each_key { |name| puts name }
         exit
       end
       parser.on('-p', '--packages',

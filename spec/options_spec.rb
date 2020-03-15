@@ -23,7 +23,7 @@ describe Options do
   end
 
   it 'should successfully validate valid options' do
-    Options.new.parse(%w[-n --system ubuntu])
+    Options.new.parse(%w[-n --system ubuntu]).validate
   end
 
   it 'should detect when --packages is given without --system' do

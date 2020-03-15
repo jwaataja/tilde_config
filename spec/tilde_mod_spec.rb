@@ -65,7 +65,7 @@ describe Tildeconfig::TildeMod do
                 m.root_dir src_dir
                 m.install_dir dst_dir
                 m.file "filea"
-                m.execute_install
+                m.execute_install(Tildeconfig::Options.new)
                 expect(FileUtils.identical? src_file, dst_file).to be(true)
             end
         end
@@ -83,7 +83,7 @@ describe Tildeconfig::TildeMod do
                 m.root_dir src_dir
                 m.install_dir dst_dir
                 m.file "filea", "fileb"
-                m.execute_install
+                m.execute_install(Tildeconfig::Options.new)
                 expect(FileUtils.identical? src_file, dst_file).to be(true)
             end
         end
