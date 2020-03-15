@@ -9,7 +9,8 @@ module Tildeconfig
 
     private_constant :DEFAULT_INSTALL_DIR
 
-    attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files
+    attr_reader :install_cmds, :uninstall_cmds, :update_cmds, :files,
+      :package_dependencies
 
     def initialize
       @root_dir = "."
