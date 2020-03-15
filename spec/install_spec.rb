@@ -3,6 +3,10 @@ require 'tildeconfig'
 include Tildeconfig
 
 describe 'The install command line function' do
+  it 'shoudl return true by default' do
+    expect(CLI.run(%w[install], load_config_file: false)).to be_truthy
+  end
+
   it 'should run install actions' do
     install1_called = false
     install2_called = false
@@ -56,5 +60,10 @@ describe 'The install command line function' do
     expect(install1_called).to be_truthy
     expect(install2_called).to be_falsey
     expect(install3_called).to be_truthy
+  end
+
+  it 'should detect unknown modules' do
+    result = CLI.run(%w[install fake_mod], load_config_file: false)
+    expect(result).to be_falsey
   end
 end
