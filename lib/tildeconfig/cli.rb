@@ -13,8 +13,11 @@ module Tildeconfig
       load(CONFIG_FILE_NAME)
 
       options = Options.new.parse(ARGV)
-      unless options.validate
-        exit
+      begin
+        options.validate
+      rescue OptionsError => e
+        warn "Invalid options: #{e.message}"
+        exit false
       end
 
       if ARGV.empty?
