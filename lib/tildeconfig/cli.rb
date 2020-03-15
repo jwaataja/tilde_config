@@ -37,46 +37,45 @@ module Tildeconfig
         puts "Unknown command #{command}"
       end
     end
-  end
 
-  def self.install(options)
-    succeeded = true
-    Globals::MODULES.each do |name, m|
-      puts "Installing #{name.to_s}"
-      begin
-        m.execute_install
-      rescue FileInstallError => e
-        warn "Error while installing module #{name}."
-        warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
-          "#{e.message}"
-        succeeded = false
+    def self.install(options)
+      succeeded = true
+      Globals::MODULES.each do |name, m|
+        puts "Installing #{name.to_s}"
+        begin
+          m.execute_install
+        rescue FileInstallError => e
+          warn "Error while installing module #{name}."
+          warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+            "#{e.message}"
+          succeeded = false
+        end
+        exit false unless succeeded
       end
-      exit false unless succeeded
+
     end
 
-  end
-
-  def self.uninstall(options)
-    Globals::MODULES.each do |name, m|
-      puts "Uninstalling #{name.to_s}"
-      m.execute_uninstall
-    end
-  end
-
-  def self.update(options)
-    succeeded = true
-    Globals::MODULES.each do |name, m|
-      puts "Updating #{name.to_s}"
-      begin
-        succeeded = m.execute_update
-      rescue FileInstallError => e
-        warn "Error while updating module #{name}."
-        warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
-          "#{e.message}"
-        succeeded = false
+    def self.uninstall(options)
+      Globals::MODULES.each do |name, m|
+        puts "Uninstalling #{name.to_s}"
+        m.execute_uninstall
       end
-      exit false unless succeeded
     end
 
+    def self.update(options)
+      succeeded = true
+      Globals::MODULES.each do |name, m|
+        puts "Updating #{name.to_s}"
+        begin
+          succeeded = m.execute_update
+        rescue FileInstallError => e
+          warn "Error while updating module #{name}."
+          warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+            "#{e.message}"
+          succeeded = false
+        end
+        exit false unless succeeded
+      end
+    end
   end
 end
