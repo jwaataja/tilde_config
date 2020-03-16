@@ -10,10 +10,15 @@ module Tildeconfig
     private_constant :DEFAULT_INSTALL_DIR
 
     attr_reader :name, :install_cmds, :uninstall_cmds, :update_cmds, :files,
-                :package_dependencies
+                :package_dependencies, :dependencies
 
-    def initialize(name)
+    ##
+    # Constructs a new module with the given name. The +dependencies+
+    # is any collection of symbols naming modules the new module depends
+    # on.
+    def initialize(name, dependencies: [])
       @name = name
+      @dependencies = Set.new(dependencies)
       @root_dir = '.'
       @install_dir = DEFAULT_INSTALL_DIR
       @files = []

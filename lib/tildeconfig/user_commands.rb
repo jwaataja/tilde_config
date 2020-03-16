@@ -1,13 +1,33 @@
 ##
-# Defines a module with the given name if it doesn't already exist. If a block
-# is provided, runs it and passes the module with the given name.
-def mod(name)
+# Defines a module with the given name if it doesn't already exist. May
+# also instaed pass a hash with a single key whose value is an array of
+# module dependencies. If a block is provided, runs it and passes the
+# module with the given name. Raises a +SyntaxError+ if an invalid Hash
+# is passed.
+def mod(arg)
+  name = nil
+  dependencies = []
+  if arg.is_a? Hash
+    if arg.size != 1
+      raise Tildeconfig::SyntaxError,
+            'Incorrect number of arguments in Hash for mod'
+    end
+
+    arg.each do |k, v|
+      name = k
+      dependencies = v
+      break
+    end
+  else
+    name = arg
+  end
   config = Tildeconfig::Configuration.instance
   unless config.modules.key?(name)
     config.modules[name] = Tildeconfig::TildeMod.new(name)
   end
-
-  yield(config.modules[name]) if block_given?
+  m = config.modules[name]
+  m.dependencies.merge(dependencies)
+  yield(m) if block_given?
 end
 
 ##

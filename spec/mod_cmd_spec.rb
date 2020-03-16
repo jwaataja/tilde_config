@@ -26,4 +26,20 @@ describe 'The mod command' do
       expect(m.name).to eq(:test_mod)
     end
   end
+
+  it 'should accept a hash as its argument to specify dependencies' do
+    Configuration.with_standard_library do
+      config = Configuration.instance
+      mod :mod1 => [:mod2, :mod3]
+      expect(config.modules[:mod1].dependencies).to eq(Set.new(%i[mod2 mod3]))
+    end
+  end
+
+  it 'should raise an error if an invalid hash is given' do
+    Configuration.with_standard_library do
+      expect { mod :mod1 => :mod2, :mod3 => :mod4 }.to raise_error(
+        Tildeconfig::SyntaxError
+      )
+    end
+  end
 end
