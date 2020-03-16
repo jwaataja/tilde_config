@@ -58,17 +58,21 @@ module Tildeconfig
     end
 
     def self.install(modules, options)
-      succeeded = true
       modules = Configuration.instance.modules.each_key if modules.empty?
       modules.each do |name|
         m = Configuration.instance.modules[name]
         puts "Installing #{name}"
+        succeeded = true
         begin
           m.execute_install(options)
         rescue FileInstallError => e
           warn "Error while installing module #{name}."
           warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
             "#{e.message}"
+          succeeded = false
+        rescue PackageInstallError => e
+          warn "Error while installing module #{name}."
+          warn e.message
           succeeded = false
         end
         return false unless succeeded
