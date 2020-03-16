@@ -10,7 +10,8 @@ module Tildeconfig
       # be the command line arguments to the program. Set +load_config_file+ to
       # false to prevent the default configuration file from being loaded. If a
       # block is provided, yields to it right after the configuration file would
-      # be loaded but before the main program executes. Returns true on success,
+      # be loaded but before the main program executes. This is so that a block
+      # can serve as a "pseudo" configuration file. Returns true on success,
       # false on failure.
       def run(args, load_config_file: true)
         if load_config_file && !File.exist?(CONFIG_FILE_NAME)
