@@ -203,6 +203,56 @@ mod :my_mod do |m|
 end
 ```
 
+### Full Examples
+
+#### Vim
+```ruby
+# Create a module called vim
+mod :vim do |m|
+  # Install the packages "vim" and "git" using the system's package manager.
+  m.pkg_dep "vim", "git"
+  # Install these files. By default they are installed to the home directory but
+  # c.vim is installed into the specified location.
+  m.file ".vimrc"
+  m.file "c.vim" ".vim/after/ftplugin/c.vim"
+  # Anything specified here is run when the module is actually installed using
+  # the command line tool.
+  m.install do
+    # Run the following shell command.
+    sh "git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
+  end
+end
+
+# Create a module called "neovim" that depends on "vim". This means vim will
+# always be installed first.
+mod :neovim => [:vim] do |m|
+  m.pkg_dep "neovim"
+  m.file ".nvimrc"
+end
+
+# Defines a package called "vim" that can be installed with the pkg_dep
+# command. Each line after the first says what the package is called on a given
+# system.
+def_package "vim",
+  :ubuntu => "vim-gtk",
+  :arch => "vim"
+
+def_package "git",
+  :ubuntu => "git",
+  :arch => "git"
+
+# Define a new system that packages can be installed on, called "arch", which is
+# short for Arch Linux.
+def_installer :arch do |packages|
+  # Install packages on Arch linux using the following shell command.
+  sh "sudo pacman -S #{packages.join(" ")}"
+end
+
+def_package "neovim",
+  :ubuntu => "neovim",
+  :arch => "neovim"
+```
+
 ## Testing
 
 To install testing packages locally, use
