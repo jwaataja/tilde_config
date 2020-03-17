@@ -200,7 +200,7 @@ module Tildeconfig
     def ask_yes_no(prompt)
       loop do
         print prompt
-        res = gets.chomp
+        res = $stdin.gets.chomp
         return true if res.start_with?(/yY/)
         return false if res.start_with?(/nN/) || res.strip.empty?
 
