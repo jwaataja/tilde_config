@@ -212,6 +212,23 @@ folder in this repository. Then run `tildeconfig install`. WARNING: This may
 override existing files on your system. It is recommended to run them on a
 virtual machine.
 
+### Shell
+
+This is a basic example. We first tell tildeconfig to install the ".zshrc" file into the home
+directory and to run the "chsh -s zsh" command when installing.
+
+```ruby
+# Define a module called "shell"
+mod :shell do |m|
+  # Install the ".zshrc" file to the home directory
+  m.file ".zshrc"
+  m.install do
+    # Run the shell command "chsh -s zsh" when installing this module.
+    sh "chsh -s zsh"
+  end
+end
+```
+
 #### Vim
 ```ruby
 # Create a module called vim
