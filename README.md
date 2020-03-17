@@ -295,7 +295,7 @@ def_package "neovim",
 ```ruby
 # Define a command called "pip_req" that can be run on modules. The first
 # argument passed to this command is always the module it was called on.
-def_cmd :pip_req |m, *pkgs| do
+def_cmd :pip_req do |m, *pkgs|
   # Modules this command is called on will depend on python and pip.
   m.pkg_dep "python3", "pip"
   m.install do
