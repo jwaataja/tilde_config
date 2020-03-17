@@ -207,6 +207,11 @@ end
 
 ### Full Examples
 
+To run the examples, navigate into one of the subdirectories of the `examples`
+folder in this repository. Then run `tildeconfig install`. WARNING: This may
+override existing files on your system. It is recommended to run them on a
+virtual machine.
+
 #### Vim
 ```ruby
 # Create a module called vim
