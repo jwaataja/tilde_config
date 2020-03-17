@@ -12,8 +12,12 @@ def_installer :ubuntu do |pkgs|
 end
 
 def_package "python",
-    ubuntu: "python3"
+    ubuntu: "python3",
     debian: "python3"
+
+def_package "pip",
+    ubuntu: "python3-pip",
+    debian: "python3-pip"
 
 mod :python_packages do
     pkg_dep "python"
@@ -23,9 +27,9 @@ end
 mod :all => [:home, :python_packages]
 
 def_cmd :pip_req do |m, *pkgs|
-    m.pkg_dep "python"
+    m.pkg_dep "python", "pip"
     m.install do
-        sh "pip install #{pkgs.join(" ")}"
+        sh "pip install --user #{pkgs.join(" ")}"
     end
 end
 
