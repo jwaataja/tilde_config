@@ -201,8 +201,8 @@ module Tildeconfig
       loop do
         print prompt
         res = $stdin.gets.chomp
-        return true if res.start_with?(/yY/)
-        return false if res.start_with?(/nN/) || res.strip.empty?
+        return true if res.start_with?(/y/i)
+        return false if res.start_with?(/n/i) || res.strip.empty?
 
         puts "Please answer 'y' or 'n'."
       end
