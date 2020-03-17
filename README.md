@@ -237,9 +237,9 @@ mod :vim do |m|
   m.pkg_dep "vim", "git"
   # Install these files. By default they are installed to the same path under
   # the home directory as they're located under the configuration file, but
-  # c.vim is installed into the a different location.
+  # c.vim is installed into a different location.
   m.file ".vimrc"
-  m.file "c.vim" ".vim/after/ftplugin/c.vim"
+  m.file "c.vim", ".vim/after/ftplugin/c.vim"
   # Anything specified here is run when the module is actually installed using
   # the command line tool.
   m.install do
