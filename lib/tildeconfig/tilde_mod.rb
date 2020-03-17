@@ -138,6 +138,19 @@ module Tildeconfig
     end
 
     ##
+    # Retrieves an array of this package's full set of dependencies,
+    # recursively resolved, in no particular order. Result includes this
+    # package.
+    def all_dependencies
+      config = Tildeconfig::Configuration.instance
+      res = Set[@name]
+      @dependencies.each do |dep|
+        res.merge(config.modules[dep].all_dependencies)
+      end
+      res.to_a
+    end
+
+    ##
     # Adds a file to be installed to this module. If only one argument is given,
     # then it will be used for both source and destination. Source is relative
     # to repository root, or set root_dir. Destination is relative to home

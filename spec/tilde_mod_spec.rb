@@ -88,4 +88,19 @@ describe Tildeconfig::TildeMod do
       end
     end
   end
+
+  describe "all_dependencies" do
+    it "resolves basic dependencies" do
+      b_installed = false
+      CLI.run(%w[install a], load_config_file: false) do
+        mod :a => [:b]
+        mod :b do |m|
+          m.install do
+            b_installed = true
+          end
+        end
+      end
+      expect(b_installed).to be_truthy
+    end
+  end
 end

@@ -90,4 +90,28 @@ describe 'The install command line function' do
     end
     expect(installed).to eq([:mod2, :mod3, :mod1])
   end
+
+  it 'should install dependent modules' do
+    installed = []
+    CLI.run(%w[install mod1], load_config_file: false) do
+      mod :mod1 => [:mod2, :mod3] do |m|
+        m.install do
+          installed << :mod1
+        end
+      end
+
+      mod :mod2 do |m|
+        m.install do
+          installed << :mod2
+        end
+      end
+
+      mod :mod3 => [:mod2] do |m|
+        m.install do
+          installed << :mod3
+        end
+      end
+    end
+    expect(installed).to eq([:mod2, :mod3, :mod1])
+  end
 end

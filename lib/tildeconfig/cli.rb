@@ -83,6 +83,7 @@ module Tildeconfig
         # This should succeed because the abscence of cycles should have been
         # validated.
         topo_sort = DependencyAlgorithms.topological_sort(graph)
+        modules = modules.flat_map { |m| config.modules[m].all_dependencies }
         modules = topo_sort.select { |m| modules.include?(m) }
         modules.each do |name|
           m = Configuration.instance.modules[name]
