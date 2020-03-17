@@ -253,6 +253,27 @@ def_package "neovim",
   :arch => "neovim"
 ```
 
+#### Python and Pip
+
+```ruby
+# Define a command called "pip_req" that can be run on modules. The first
+# argument passed to this command is always the module it was called on.
+def_cmd :pip_req |m, *pkgs| do
+  # Modules this command is called on will depend on python.
+  m.pkg_dep "python"
+  m.install do
+    # This is the command that installs pip packages. Now it doesn't have to be
+    # written for each module that uses it individually.
+    sh "pip install #{pkgs.join(" ")}"
+  end
+end
+
+mod :my_mod do |m|
+  # After defining the command, it can be called on modules.
+  m.pip_req "numpy"
+end
+```
+
 ## Testing
 
 To install testing packages locally, use
