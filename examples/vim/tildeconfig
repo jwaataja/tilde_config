@@ -1,0 +1,25 @@
+mod :vim do |m|
+  m.pkg_dep "vim", "git"
+  m.file ".vimrc"
+  m.file "c.vim" ".vim/after/ftplugin/c.vim"
+  m.install do
+    sh "git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
+  end
+end
+
+mod :neovim => [:vim] do |m|
+  m.pkg_dep "neovim"
+  m.file ".nvimrc"
+end
+
+def_package "vim",
+  :ubuntu => "vim-gtk",
+  :arch => "vim"
+
+def_installer :arch do |*packages|
+  sh "sudo pacman -S #{packages.join(" ")}"
+end
+
+def_package "neovim",
+  :ubuntu => "neovim",
+  :arch => "neovim"
