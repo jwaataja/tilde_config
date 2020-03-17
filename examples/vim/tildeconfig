@@ -16,6 +16,10 @@ def_package "vim",
   :ubuntu => "vim-gtk",
   :arch => "vim"
 
+def_package "git",
+  :ubuntu => "git",
+  :arch => "git"
+
 def_installer :arch do |*packages|
   sh "sudo pacman -S #{packages.join(" ")}"
 end
