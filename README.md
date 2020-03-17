@@ -260,12 +260,12 @@ def_package "neovim",
 # Define a command called "pip_req" that can be run on modules. The first
 # argument passed to this command is always the module it was called on.
 def_cmd :pip_req |m, *pkgs| do
-  # Modules this command is called on will depend on python.
-  m.pkg_dep "python"
+  # Modules this command is called on will depend on python and pip.
+  m.pkg_dep "python3", "pip"
   m.install do
     # This is the command that installs pip packages. Now it doesn't have to be
     # written for each module that uses it individually.
-    sh "pip install #{pkgs.join(" ")}"
+    sh "pip install --user #{pkgs.join(" ")}"
   end
 end
 
@@ -273,6 +273,13 @@ mod :my_mod do |m|
   # After defining the command, it can be called on modules.
   m.pip_req "numpy"
 end
+
+# Tell tildeconfig what each package is called under ubuntu
+def_package "python3",
+    :ubuntu => "python3"
+
+def_package "pip",
+    :ubuntu => "python3-pip"
 ```
 
 ## Testing
