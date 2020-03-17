@@ -148,13 +148,6 @@ module Tildeconfig
       @files << file_tuple
     end
 
-    # def_pkg is defined as a class method for modifying the TildeMod class.
-    # It will later be added to global scope within scripts
-    def self.def_cmd(name)
-      # the given block should take in (module, *other_args)
-      define_method(name, ->(*args) { yield self, *args })
-    end
-
     private
 
     ##

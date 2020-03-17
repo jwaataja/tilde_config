@@ -55,3 +55,11 @@ def def_package(name, system_names = {})
   config.system_packages[name] =
     Tildeconfig::SystemPackage.new(name, system_names)
 end
+
+# Defines a command with the given name. This command will be callable on
+# modules. When called it will yield to the provided block passing the module
+# itself and the rest of the arguments.
+def def_cmd(name)
+  # the given block should take in (module, *other_args)
+  Tildeconfig::TildeMod.define_method(name, ->(*args) { yield(self, *args) })
+end
