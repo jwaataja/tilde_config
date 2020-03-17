@@ -116,7 +116,92 @@ when installing.
 ### System packages
 
 It's useless to install Vim configuration files if Vim isn't installed.
-Similarly 
+Similarly, one of the above commands requires having git installed. We can tell
+`tildeconfig` to install these automatically by using the `pkg_dep` command like
+this.
+```ruby
+mod :vim do |m|
+  m.pkg_dep "vim", "git"
+end
+```
+
+This tells tildeconfig to install the "vim" and "git" packages on the user's
+system using a package manager. But for this to work, we must first tell it what
+the names of the packages we want on our system are. For example, on Ubuntu we
+may want to install the "vim-pkg". To specify what the name of a package is on a
+given system, you can use the `def_package` command.
+```ruby
+def_package "vim",
+  :ubuntu => "vim-gtk"
+
+def_package "git",
+  :ubuntu => "git"
+```
+
+Note, Ubuntu is already defined in tildeconfig. You can define your own system
+by telling it how to install packages. For this you will have to understand a
+little bit of Ruby. The command is `def_installer` and you must tell it how to
+install packages on that system. For example, to add support for Arch Linux we
+would write,
+```ruby
+def_installer :arch do |packages|
+  sh "sudo pacman -S #{packages.join(' ')}"
+end
+```
+
+We could then modify the package definitions to include Arch Linux:
+```ruby
+def_package "vim",
+  :ubuntu => "vim-gtk",
+  :arch => "vim"
+
+def_package "git",
+  :ubuntu => "git",
+  :arch => "vim"
+```
+
+### Dependencies
+
+Sometimes modules must be installed in a specific order, or one should always be
+installed when another is. To specify that a module depends on another, you can
+add `=> [dependencies]` to its definition. For example, the program neovim is a
+rewrite of Vim. It can use many of the same configuration files as Vim, so we
+might want to specify that Vim should be installed whenever neovim is. That is,
+neovim *depends* on Vim. To do this we would write
+```ruby
+mod :vim
+
+mod :neovim => [:vim]
+```
+
+Now, the `vim` module will always be installed before `neovim` when we run
+`tildeconfig install`.
+
+### Custom commands
+
+You can extend the tildeconfig language by adding custom commands that may be
+called on modules. We do this with the `def_cmd` command. You can then give it a
+parameter list inside two `|` characters and then a block of code. The first
+parameter passed to your command will always be a module.
+
+For example, say we have many modules that install pip packages. All of these
+modules depend on `python` and each time we have to manually write the shell
+command used to install pip commands. For pip we might write,
+```ruby
+def_cmd :pip_req |m, *pkgs| do
+  m.pkg_dep "python"
+  m.install do
+    sh "pip install #{pkgs.join(" ")}"
+  end
+end
+```
+
+Then in a new module we can use this module command.
+```ruby
+mod :my_mod do |m|
+  m.pip_req "numpy"
+end
+```
 
 ## Testing
 
