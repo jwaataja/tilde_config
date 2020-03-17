@@ -162,6 +162,13 @@ def_package "git",
   :arch => "git"
 ```
 
+By default, tildeconfig doesn't install any packages. To install all package
+dependencies when installing run,
+```ruby
+tildeconfig --packages --system ubuntu
+```
+You can specify a different system from `ubuntu` but you must define it manually
+
 ### Dependencies
 
 Sometimes modules must be installed in a specific order, or one should always be
@@ -211,6 +218,10 @@ To run the examples, navigate into one of the subdirectories of the `examples`
 folder in this repository. Then run `tildeconfig install`. WARNING: This may
 override existing files on your system. It is recommended to run them on a
 virtual machine.
+
+For examples with system package dependencies, assuming you're on Ubuntu you
+should instead run, `tildeconfig install --packages --system ubuntu`. If you
+want to use a different package manager, you must defined it manually.
 
 ### Shell
 
