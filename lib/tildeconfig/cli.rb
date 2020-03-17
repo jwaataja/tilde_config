@@ -4,104 +4,190 @@ module Tildeconfig
   ##
   # Methods for the tildeconfig command line interface.
   module CLI
-    ##
-    # Starts the main execution of the command line program. The +args+ should
-    # be the command line arguments to the program. Set +load_config_file+ to
-    # false to prevent the default configuration file from being loaded. If a
-    # block is provided, yields to it right after the configuration file would
-    # be loaded but before the main program executes. Returns true on success,
-    # false on failure.
-    def self.run(args, load_config_file: true)
-      if load_config_file && !File.exist?(CONFIG_FILE_NAME)
-        warn "Failed to find config file #{CONFIG_FILE_NAME}"
-        return false
-      end
-
-      Configuration.with_standard_library do
-        load(CONFIG_FILE_NAME) if load_config_file
-
-        yield if block_given?
-
-        options = Options.new.parse(args)
-        begin
-          options.validate
-        rescue OptionsError => e
-          warn "Invalid options: #{e.message}"
+    class << self
+      ##
+      # Starts the main execution of the command line program. The +args+ should
+      # be the command line arguments to the program. Set +load_config_file+ to
+      # false to prevent the default configuration file from being loaded. If a
+      # block is provided, yields to it right after the configuration file would
+      # be loaded but before the main program executes. This is so that a block
+      # can serve as a "pseudo" configuration file. Returns true on success,
+      # false on failure.
+      def run(args, load_config_file: true)
+        if load_config_file && !File.exist?(CONFIG_FILE_NAME)
+          warn "Failed to find config file #{CONFIG_FILE_NAME}"
           return false
         end
 
-        if args.empty?
-          options.print_help
-          return false
-        end
+        Configuration.with_standard_library do
+          found_error = false
+          begin
+            load(CONFIG_FILE_NAME) if load_config_file
+          rescue SyntaxError => e
+            warn 'Syntax error while reading configuration file:'
+            warn e.message
+            found_error = true
+          end
+          return false if found_error
 
-        command = args[0]
-        modules = args.drop(1).map(&:to_sym)
-        modules.each do |m|
-          unless Configuration.instance.modules.key?(m)
-            warn "Unknown module #{m}"
+          yield if block_given?
+
+          return false unless validate_configuration
+
+          options = Options.new.parse(args)
+          begin
+            options.validate
+          rescue OptionsError => e
+            warn "Invalid options: #{e.message}"
+            found_error = true
+          end
+          return false if found_error
+
+          if args.empty?
+            options.print_help
             return false
           end
-        end
-        case command
-        when 'install'
-          install(modules, options)
-        when 'uninstall'
-          uninstall(options)
-        when 'update'
-          update(options)
-        else
-          puts "Unknown command #{command}"
-          false
+
+          command = args[0]
+          modules = args.drop(1).map(&:to_sym)
+          modules.each do |m|
+            unless Configuration.instance.modules.key?(m)
+              warn "Unknown module #{m}"
+              return false
+            end
+          end
+          case command
+          when 'install'
+            install(modules, options)
+          when 'uninstall'
+            uninstall(options)
+          when 'update'
+            update(options)
+          else
+            puts "Unknown command #{command}"
+            false
+          end
         end
       end
-    end
 
-    def self.install(modules, options)
-      modules = Configuration.instance.modules.each_key if modules.empty?
-      modules.each do |name|
-        m = Configuration.instance.modules[name]
-        puts "Installing #{name}"
+      ##
+      # Installs the given modules with the given options. If +modules+ is
+      # empty then installs all modules. Returns true on success, false on
+      # failure.
+      def install(modules, options)
+        modules = Configuration.instance.modules.keys if modules.empty?
+        config = Configuration.instance
+        graph = DependencyAlgorithms.build_dependency_graph(config)
+        # This should succeed because the abscence of cycles should have been
+        # validated.
+        topo_sort = DependencyAlgorithms.topological_sort(graph)
+        modules = topo_sort.select { |m| modules.include?(m) }
+        modules.each do |name|
+          m = Configuration.instance.modules[name]
+          puts "Installing #{name}"
+          succeeded = true
+          begin
+            m.execute_install(options)
+          rescue FileInstallError => e
+            warn "Error while installing module #{name}."
+            warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+              "#{e.message}"
+            succeeded = false
+          rescue PackageInstallError => e
+            warn "Error while installing module #{name}."
+            warn e.message
+            succeeded = false
+          end
+          return false unless succeeded
+        end
+        true
+      end
+
+      ##
+      # Uninstalls all modules. Returns true on success, false on failure.
+      def uninstall(options)
+        Configuration.instance.modules.each do |name, m|
+          puts "Uninstalling #{name}"
+          m.execute_uninstall
+        end
+        true
+      end
+
+      ##
+      # Updates all modules. Returns true on success, false on failure.
+      def update(options)
         succeeded = true
+        Configuration.instance.modules.each do |name, m|
+          puts "Updating #{name}"
+          begin
+            succeeded = m.execute_update
+          rescue FileInstallError => e
+            warn "Error while updating module #{name}."
+            warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
+              "#{e.message}"
+            succeeded = false
+          end
+          ereturn false unless succeeded
+        end
+        true
+      end
+
+      private
+
+      ##
+      # Validates the current configuration. Returns true on success. Return
+      # false and prints an error message on failure.
+      def validate_configuration
+        return false unless validate_dependency_references
+
+        validate_circular_dependencies
+      end
+
+      ##
+      # Validates that the dependencies in the current configuration reference
+      # valid modules. Returns true if all are valid. Returns false and prints
+      # an error message otherwise.
+      def validate_dependency_references
+        config = Configuration.instance
+        found_error = false
         begin
-          m.execute_install(options)
-        rescue FileInstallError => e
-          warn "Error while installing module #{name}."
-          warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
-            "#{e.message}"
-          succeeded = false
-        rescue PackageInstallError => e
-          warn "Error while installing module #{name}."
+          ConfigurationChecks.validate_dependency_references(config)
+        rescue DependencyReferenceError => e
+          warn 'Error in configuraiton file:'
           warn e.message
-          succeeded = false
+          found_error = false
         end
-        return false unless succeeded
+        !found_error
       end
-      true
-    end
 
-    def self.uninstall(options)
-      Configuration.instance.modules.each do |name, m|
-        puts "Uninstalling #{name}"
-        m.execute_uninstall
-      end
-    end
-
-    def self.update(options)
-      succeeded = true
-      Configuration.instance.modules.each do |name, m|
-        puts "Updating #{name}"
+      ##
+      # Validates the abscence of circular dependencies in the current
+      # configuration. Returns true if there are no cycles. Returns false and
+      # prints an error message otherwise.
+      def validate_circular_dependencies
+        config = Configuration.instance
+        found_error = false
         begin
-          succeeded = m.execute_update
-        rescue FileInstallError => e
-          warn "Error while updating module #{name}."
-          warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
-            "#{e.message}"
-          succeeded = false
+          ConfigurationChecks.validate_circular_dependencies(config)
+        rescue CircularDependencyError => e
+          print_circular_dependency_error(e)
+          found_error = false
         end
-        ereturn false unless succeeded
+        !found_error
       end
-      true
+
+      ##
+      # Prints a helpful error message for a given +CircularDependencyError+
+      # error.
+      def print_circular_dependency_error(error)
+        warn 'Error in configuration file:'
+        warn error.message
+        cycle = error.cycle
+        cycle.each.with_index do |name, i|
+          dep = cycle[(i + 1) % cycle.size]
+          warn "\tmodule #{name} depends on #{dep}"
+        end
+      end
     end
   end
 end
