@@ -211,8 +211,9 @@ end
 mod :vim do |m|
   # Install the packages "vim" and "git" using the system's package manager.
   m.pkg_dep "vim", "git"
-  # Install these files. By default they are installed to the home directory but
-  # c.vim is installed into the specified location.
+  # Install these files. By default they are installed to the same path under
+  # the home directory as they're located under the configuration file, but
+  # c.vim is installed into the a different location.
   m.file ".vimrc"
   m.file "c.vim" ".vim/after/ftplugin/c.vim"
   # Anything specified here is run when the module is actually installed using
