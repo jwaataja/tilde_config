@@ -131,8 +131,8 @@ module Tildeconfig
         end
         next if FileUtils.compare_file(src, dest)
 
-        proceed = ask_yes_no("Update #{src} in repository from #{dest}? [y/N]")
-        cp(dest, src) if proceed
+        proceed = ask_yes_no("Update #{src} in repository from #{dest}? [y/N] ")
+        FileUtils.cp(dest, src) if proceed
       end
     end
 
