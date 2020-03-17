@@ -11,7 +11,7 @@ end
 
 mod :all do |m|
   m.pip_req "numpy"
-  file "binaries/python_sort" ".bin/python_sort"
+  m.file "binaries/python_sort", ".bin/python_sort"
 end
 
 ###
