@@ -20,7 +20,7 @@ def_package "git",
   :ubuntu => "git",
   :arch => "git"
 
-def_installer :arch do |*packages|
+def_installer :arch do |packages|
   sh "sudo pacman -S #{packages.join(" ")}"
 end
 
