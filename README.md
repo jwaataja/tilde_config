@@ -128,7 +128,7 @@ end
 This tells tildeconfig to install the "vim" and "git" packages on the user's
 system using a package manager. But for this to work, we must first tell it what
 the names of the packages we want on our system are. For example, on Ubuntu we
-may want to install the "vim-pkg". To specify what the name of a package is on a
+may want to install the "vim-gtk". To specify what the name of a package is on a
 given system, you can use the `def_package` command.
 ```ruby
 def_package "vim",
