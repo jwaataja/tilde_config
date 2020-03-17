@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+import numpy
+
+print("Input some comma-separated numbers > ", end='')
+print(numpy.sort([int(x.strip()) for x in input().split(',')]))
