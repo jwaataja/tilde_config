@@ -3,6 +3,8 @@ DSL for managing user space configuration settings
 
 [HW5.5 Slides](https://docs.google.com/presentation/d/1z6cgpZADoadWwKAxk07Pm_cPMlNM6Ut6KmN2kntYLi4/edit?usp=sharing)
 
+[HW5.5 2-minute Video Demonstration](https://youtu.be/ZtLN6kN1PQA)
+
 [HW5.4 Document](https://docs.google.com/document/d/1vc3pySso0WUYom3mqbICaZFvgZp0FfTEhX26g6eaO50/edit?usp=sharing)
 
 [HW5.3 Document](https://docs.google.com/document/d/1MDWj7eHZowquE_PKR8kccA7BAukDoNmrVssVaJJluIc/edit?usp=sharing)
