@@ -177,15 +177,15 @@ module Tildeconfig
       dest = File.join(@install_dir, file_tuple.dest)
       FileUtils.rm(dest) if ask_yes_no("Delete #{dest}? [y/N] ")
       # remove empty directories
-      dir = dest
-      loop do
-        # grab dir's parent
-        dir = File.split(dir)[0]
-        if Dir.empty?(dir)
-          puts "Removing empty directory #{dir}"
-          Dir.delete(dir)
-        end
-      end
+      # dir = dest
+      # loop do
+      #   # grab dir's parent
+      #   dir = File.split(dir)[0]
+      #   if Dir.empty?(dir)
+      #     puts "Removing empty directory #{dir}"
+      #     Dir.delete(dir)
+      #   end
+      # end
     end
 
     ##
