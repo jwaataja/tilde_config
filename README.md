@@ -236,7 +236,7 @@ mod :shell do |m|
   m.file ".zshrc"
   m.install do
     # Run the shell command "chsh -s /bin/zsh" when installing this module.
-    sh "chsh -s zsh"
+    sh "chsh -s /bin/zsh"
   end
 end
 ```
