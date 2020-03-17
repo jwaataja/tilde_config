@@ -5,7 +5,7 @@ mod :vim do |m|
   # Install these files. By default they are installed to the home directory but
   # c.vim is installed into the specified location.
   m.file ".vimrc"
-  m.file "c.vim" ".vim/after/ftplugin/c.vim"
+  m.file "c.vim", ".vim/after/ftplugin/c.vim"
   # Anything specified here is run when the module is actually installed using
   # the command line tool.
   m.install do
