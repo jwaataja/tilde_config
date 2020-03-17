@@ -144,6 +144,7 @@ module Tildeconfig
           puts "Refreshing module #{name}"
           config.modules[name].execute_refresh
         end
+        true
       end
 
       private
