@@ -109,6 +109,33 @@ module Tildeconfig
       update_cmds.each(&:call)
     end
 
+    def execute_refresh
+      files.each do |file|
+        src = src_path(file)
+        dest = dest_path(file)
+        unless File.exist?(src)
+          puts "Warning: #{src} does not exist"
+          next
+        end
+        unless File.file?(src)
+          puts "Warning: #{src} is not a regular file"
+          next
+        end
+        unless File.exist?(dest)
+          puts "Warning: #{dest} does not exist, skipping"
+          next
+        end
+        unless File.file?(dest)
+          puts "Warning: #{dest} is not a regular file, skipping"
+          next
+        end
+        next if FileUtils.compare_file(src, dest)
+
+        proceed = ask_yes_no("Update #{src} in repository from #{dest}? [y/N]")
+        cp(dest, src) if proceed
+      end
+    end
+
     ##
     # Adds a file to be installed to this module. If only one argument is given,
     # then it will be used for both source and destination. Source is relative
@@ -135,8 +162,8 @@ module Tildeconfig
     def run_file_install(file_tuple)
       # TODO: this assumes that our working directory will always be the user's
       # settings repository.
-      src = File.join(@root_dir, file_tuple.src)
-      dest = File.join(@install_dir, file_tuple.dest)
+      src = src_path(file_tuple)
+      dest = dest_path(file_tuple)
       unless File.exist?(src)
         raise FileInstallError.new("missing source file #{src}", file_tuple)
       end
@@ -212,6 +239,18 @@ module Tildeconfig
         return package
       end
       config.system_packages.fetch(package).name_for_system(system)
+    end
+
+    ##
+    # Returns the full absolute source path for the given file object.
+    def src_path(file)
+      File.join(@root_dir, file.src)
+    end
+
+    ##
+    # Returns the full absolute destination path for the given file object.
+    def dest_path(file)
+      File.join(@install_dir, file.dest)
     end
   end
 end

@@ -63,6 +63,8 @@ module Tildeconfig
             uninstall(options)
           when 'update'
             update(options)
+          when 'refresh'
+            refresh(modules, options)
           else
             puts "Unknown command #{command}"
             false
@@ -75,8 +77,8 @@ module Tildeconfig
       # empty then installs all modules. Returns true on success, false on
       # failure.
       def install(modules, options)
-        modules = Configuration.instance.modules.keys if modules.empty?
         config = Configuration.instance
+        modules = config.modules.keys if modules.empty?
         graph = DependencyAlgorithms.build_dependency_graph(config)
         # This should succeed because the abscence of cycles should have been
         # validated.
@@ -130,6 +132,18 @@ module Tildeconfig
           ereturn false unless succeeded
         end
         true
+      end
+
+      ##
+      # Refreshs the files of all given modules. If +modules+ is empty, then
+      # refreshes all modules.
+      def refresh(modules, options)
+        config = Configuration.instance
+        modules = Configuration.instance.modules.keys if modules.empty?
+        modules.each do |name|
+          puts "Refreshing module #{name}"
+          config.modules[name].execute_refresh
+        end
       end
 
       private
