@@ -163,11 +163,12 @@ def_package "git",
 ```
 
 By default, tildeconfig doesn't install any packages. To install all package
-dependencies when installing run,
+dependencies when installing, run
 ```ruby
 tildeconfig --packages --system ubuntu
 ```
-You can specify a different system from `ubuntu` but you must define it manually
+You can specify a different system from `ubuntu` but you must define it
+manually.
 
 ### Dependencies
 
@@ -221,12 +222,12 @@ virtual machine.
 
 For examples with system package dependencies, assuming you're on Ubuntu you
 should instead run, `tildeconfig install --packages --system ubuntu`. If you
-want to use a different package manager, you must defined it manually.
+want to use a different package manager, you must define it manually.
 
-### Shell
+#### Shell
 
 This is a basic example. We first tell tildeconfig to install the ".zshrc" file into the home
-directory and to run the "chsh -s zsh" command when installing.
+directory and to run the `chsh -s zsh` command when installing.
 
 ```ruby
 # Define a module called "shell"
