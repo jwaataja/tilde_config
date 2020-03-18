@@ -20,6 +20,9 @@ module TildeConfig
 
       private
 
+      ##
+      # Verifies that a file at +src_path+ exists. Raises a +FileInstallError+
+      # if it does not.
       def check_src_file_exists(file_tuple, src_path)
         return if File.exist?(src_path)
 
