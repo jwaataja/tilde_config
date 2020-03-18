@@ -35,7 +35,6 @@ module TildeConfig
     #
     # The block will be given 0 arguments, and run in this module's context.
     def install(&block)
-      # install must be passed a block
       raise 'missing block argument' unless block_given?
 
       @install_cmds << block
@@ -177,17 +176,7 @@ module TildeConfig
       # settings repository.
       src = src_path(file_tuple)
       dest = dest_path(file_tuple)
-      unless File.exist?(src)
-        raise FileInstallError.new("missing source file #{src}", file_tuple)
-      end
-
-      if File.exist?(dest) && File.directory?(dest)
-        raise FileInstallError.new("can't install to non-directory #{dest}",
-                                   file_tuple)
-      end
-      FileUtils.mkdir_p(File.dirname(dest))
-      puts "Copying #{src} to #{dest}"
-      FileUtils.cp(src, dest)
+      FileInstallUtils.install(file_tuple, src, dest)
     end
 
     ##
@@ -231,10 +220,10 @@ module TildeConfig
         find_package_name(package, system)
       end
       config = Configuration.instance
-      unless config.installers[system].install(package_names)
-        raise PackageInstallError, 'Failed to install package(s) ' \
-          "#{package_names.join(', ')} for system #{system}"
-      end
+      return if config.installers[system].install(package_names)
+
+      raise PackageInstallError, 'Failed to install package(s) ' \
+        "#{package_names.join(', ')} for system #{system}"
     end
 
     ##
@@ -255,13 +244,13 @@ module TildeConfig
     end
 
     ##
-    # Returns the full absolute source path for the given +TildeFile+.
+    # Returns the full source path for the given +TildeFile+.
     def src_path(file_tuple)
       File.join(@root_dir, file_tuple.src)
     end
 
     ##
-    # Returns the full absolute destination path for the given +TildeFile+.
+    # Returns the full destination path for the given +TildeFile+.
     def dest_path(file_tuple)
       if Pathname.new(file_tuple.dest).absolute?
         file_tuple.dest
