@@ -55,18 +55,18 @@ describe TildeConfig::TildeMod do
       m = TildeConfig::TildeMod.new(:test_name)
 
       Dir.mktmpdir() do |dir|
-        src_dir = File.join dir, "source"
-        dst_dir = File.join dir, "dest"
-        src_file = File.join src_dir, "filea"
-        dst_file = File.join dst_dir, "filea"
-        Dir.mkdir src_dir
-        Dir.mkdir dst_dir
-        File.write src_file, "some contents"
+        src_dir = File.join(dir, 'source')
+        dst_dir = File.join(dir, 'dest')
+        src_file = File.join(src_dir, 'filea')
+        dst_file = File.join(dst_dir, 'filea')
+        Dir.mkdir(src_dir)
+        Dir.mkdir(dst_dir)
+        File.write(src_file, 'some contents')
         m.root_dir src_dir
         m.install_dir dst_dir
-        m.file "filea"
+        m.file 'filea'
         m.execute_install(TildeConfig::Options.new)
-        expect(FileUtils.identical? src_file, dst_file).to be(true)
+        expect(FileUtils.identical?(src_file, dst_file)).to be_truthy
       end
     end
     it "two-arg syntax works" do

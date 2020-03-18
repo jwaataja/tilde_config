@@ -1,3 +1,5 @@
+require 'fileutils'
+require 'pathname'
 require 'set'
 
 module TildeConfig
@@ -109,6 +111,7 @@ module TildeConfig
       update_cmds.each(&:call)
     end
 
+    # TODO: Comment this.
     def execute_refresh
       files.each do |file|
         src = src_path(file)
@@ -151,10 +154,13 @@ module TildeConfig
     end
 
     ##
-    # Adds a file to be installed to this module. If only one argument is given,
-    # then it will be used for both source and destination. Source is relative
-    # to repository root, or set root_dir. Destination is relative to home
-    # directory, or dir set by install_dir.
+    # Adds a file to this module. The source path should be a file path relative
+    # to the module root directory. The +dest+ represents the location the file
+    # will be installed, including it's name (it's not just the directory). If
+    # it's relative, then the file is installed relative to the module install
+    # directory. If +dest+ is not given, then the file is installed to the same
+    # relative path in the module install directory as the source file is in the
+    # module root directory.
     def file(src, dest = nil)
       dest = src if dest.nil?
       file_tuple = TildeFile.new(src, dest)
@@ -249,15 +255,19 @@ module TildeConfig
     end
 
     ##
-    # Returns the full absolute source path for the given file object.
-    def src_path(file)
-      File.join(@root_dir, file.src)
+    # Returns the full absolute source path for the given +TildeFile+.
+    def src_path(file_tuple)
+      File.join(@root_dir, file_tuple.src)
     end
 
     ##
-    # Returns the full absolute destination path for the given file object.
-    def dest_path(file)
-      File.join(@install_dir, file.dest)
+    # Returns the full absolute destination path for the given +TildeFile+.
+    def dest_path(file_tuple)
+      if Pathname.new(file_tuple.dest).absolute?
+        file_tuple.dest
+      else
+        File.join(@install_dir, file_tuple.dest)
+      end
     end
   end
 end
