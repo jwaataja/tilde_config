@@ -90,7 +90,7 @@ module TildeConfig
     # when a file fails to install. Raises +PackageInstallError+ if a
     # package fails to install.
     def execute_install(options)
-      install_dependencies(options) if options.packages
+      install_system_dependencies(options) if options.packages
       @files.each { |file| run_file_install(file) }
       install_cmds.each(&:call)
     end
@@ -144,12 +144,10 @@ module TildeConfig
     # recursively resolved, in no particular order. Result includes this
     # package.
     def all_dependencies
-      config = TildeConfig::Configuration.instance
-      res = Set[@name]
-      @dependencies.each do |dep|
-        res.merge(config.modules[dep].all_dependencies)
-      end
-      res.to_a
+      result = Set.new
+      visited = Set.new
+      all_dependencies_helper(@name, visited, result)
+      result.to_a
     end
 
     ##
@@ -167,6 +165,20 @@ module TildeConfig
     end
 
     private
+
+    ##
+    # Adds +module_name+ and all its dependencies (calculated recursive) to
+    # +result+ using +visited+ to prevent visiting the same module twice.
+    def all_dependencies_helper(module_name, visited, result)
+      result << module_name
+      config = Configuration.instance
+      config.modules.fetch(module_name).dependencies.each do |dependency|
+        next if visited.include?(dependency)
+
+        visited << dependency
+        all_dependencies_helper(dependency, visited, result)
+      end
+    end
 
     ##
     # Method run to install a file. Used by TildeMod.file. Rasises an
@@ -214,7 +226,7 @@ module TildeConfig
     # Installs all package denpendencies. Prints a warning to the user if
     # there's that hasn't been definde with +def_package+. Rasises an
     # +PackageInstallError+ if any fail to install.
-    def install_dependencies(options)
+    def install_system_dependencies(options)
       system = options.system
       package_names = @package_dependencies.map do |package|
         find_package_name(package, system)

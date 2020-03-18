@@ -69,7 +69,7 @@ describe TildeConfig::TildeMod do
         m.install_dir dst_dir
         m.file 'filea'
         m.execute_install(TildeConfig::Options.new)
-        expect(FileUtils.identical?(src_file, dst_file)).to be_truthy
+        expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
       end
     end
 
@@ -88,7 +88,22 @@ describe TildeConfig::TildeMod do
         m.install_dir dst_dir
         m.file 'filea', 'fileb'
         m.execute_install(TildeConfig::Options.new)
-        expect(FileUtils.identical?(src_file, dst_file)).to be(true)
+        expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
+      end
+    end
+
+    it 'can install to absolute paths' do
+      m = TildeConfig::TildeMod.new(:test)
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src')
+        src_path = File.join(src_dir, 'input')
+        Dir.mkdir(src_dir)
+        File.write(src_path, 'contents')
+        dest_path = File.join(dir, 'output')
+        m.root_dir src_dir
+        m.file 'input', dest_path
+        m.execute_install(TildeConfig::Options.new)
+        expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
       end
     end
   end
@@ -105,6 +120,28 @@ describe TildeConfig::TildeMod do
         end
       end
       expect(b_installed).to be_truthy
+    end
+
+    it 'follows multiple levels' do
+      Configuration.with_empty_configuration do
+        mod :mod1 => [:mod2]
+        mod :mod2 => [:mod3]
+        mod :mod3
+        mod :mod4
+        config = Configuration.instance
+        m = config.modules.fetch(:mod1)
+        expect(m.all_dependencies.sort).to eq(%i[mod1 mod2 mod3])
+      end
+    end
+
+    it 'works even with circular dependencies' do
+      Configuration.with_empty_configuration do
+        mod :mod1 => [:mod2]
+        mod :mod2 => [:mod1]
+        config = Configuration.instance
+        m = config.modules.fetch(:mod1)
+        expect(m.all_dependencies.sort).to eq(%i[mod1 mod2])
+      end
     end
   end
 end
