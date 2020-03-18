@@ -1,4 +1,5 @@
 require 'tildeconfig'
+require 'tmpdir'
 
 include TildeConfig
 

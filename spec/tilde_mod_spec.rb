@@ -1,5 +1,5 @@
 require 'tildeconfig'
-require 'tempfile'
+require 'tmpdir'
 
 describe TildeConfig::TildeMod do
   it 'exists, and has basic methods' do
