@@ -1,9 +1,9 @@
 require 'tildeconfig'
 require 'tempfile'
 
-describe Tildeconfig::TildeMod do
+describe TildeConfig::TildeMod do
   it "exists, and has basic methods" do
-    m = Tildeconfig::TildeMod.new(:test_name)
+    m = TildeConfig::TildeMod.new(:test_name)
     m.install do
       print "no-op"
     end
@@ -18,7 +18,7 @@ describe Tildeconfig::TildeMod do
     expect(m.update_cmds.length).to eq(1)
   end
   it "allows both types of file invocations" do
-    m = Tildeconfig::TildeMod.new(:test_name)
+    m = TildeConfig::TildeMod.new(:test_name)
     m.file "source"
     m.file "source2" "destination2"
     expect(m.files.size).to eq(2)
@@ -35,7 +35,7 @@ describe Tildeconfig::TildeMod do
       dummy.method1
     end
 
-    m = Tildeconfig::TildeMod.new(:test_name)
+    m = TildeConfig::TildeMod.new(:test_name)
     m.my_method 1, 42
   end
   it "Custom methods can use further methods" do
@@ -45,14 +45,14 @@ describe Tildeconfig::TildeMod do
       end
     end
 
-    m = Tildeconfig::TildeMod.new(:test_name)
+    m = TildeConfig::TildeMod.new(:test_name)
     expect(m).to receive(:install)
     m.my_method
   end
 
   describe "Installing files" do
     it "one-arg syntax works" do
-      m = Tildeconfig::TildeMod.new(:test_name)
+      m = TildeConfig::TildeMod.new(:test_name)
 
       Dir.mktmpdir() do |dir|
         src_dir = File.join dir, "source"
@@ -65,12 +65,12 @@ describe Tildeconfig::TildeMod do
         m.root_dir src_dir
         m.install_dir dst_dir
         m.file "filea"
-        m.execute_install(Tildeconfig::Options.new)
+        m.execute_install(TildeConfig::Options.new)
         expect(FileUtils.identical? src_file, dst_file).to be(true)
       end
     end
     it "two-arg syntax works" do
-      m = Tildeconfig::TildeMod.new(:test_name)
+      m = TildeConfig::TildeMod.new(:test_name)
 
       Dir.mktmpdir() do |dir|
         src_dir = File.join dir, "source"
@@ -83,7 +83,7 @@ describe Tildeconfig::TildeMod do
         m.root_dir src_dir
         m.install_dir dst_dir
         m.file "filea", "fileb"
-        m.execute_install(Tildeconfig::Options.new)
+        m.execute_install(TildeConfig::Options.new)
         expect(FileUtils.identical? src_file, dst_file).to be(true)
       end
     end

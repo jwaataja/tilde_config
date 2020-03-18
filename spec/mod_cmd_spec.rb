@@ -1,6 +1,6 @@
 require 'tildeconfig'
 
-include Tildeconfig
+include TildeConfig
 
 describe 'The mod command' do
   it 'should define a module when passed nothing' do
@@ -38,7 +38,7 @@ describe 'The mod command' do
   it 'should raise an error if an invalid hash is given' do
     Configuration.with_standard_library do
       expect { mod :mod1 => :mod2, :mod3 => :mod4 }.to raise_error(
-        Tildeconfig::SyntaxError
+        TildeConfig::SyntaxError
       )
     end
   end

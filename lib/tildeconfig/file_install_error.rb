@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # An error when a file fails to install.
   class FileInstallError < StandardError

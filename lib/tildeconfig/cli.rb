@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   CONFIG_FILE_NAME = 'tildeconfig'
 
   ##

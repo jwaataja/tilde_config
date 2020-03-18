@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # A file that can be installed.
   class TildeFile

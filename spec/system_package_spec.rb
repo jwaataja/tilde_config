@@ -1,6 +1,6 @@
 require "tildeconfig"
 
-include Tildeconfig
+include TildeConfig
 
 describe SystemPackage do
   it "should remember its system names correctly" do

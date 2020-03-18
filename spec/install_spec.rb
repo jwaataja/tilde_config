@@ -1,6 +1,6 @@
 require 'tildeconfig'
 
-include Tildeconfig
+include TildeConfig
 
 describe 'The install command line function' do
   it 'shoudl return true by default' do

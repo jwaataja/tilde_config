@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # An error representing the prescence of circular dependencies between
   # modules.

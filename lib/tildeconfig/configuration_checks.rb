@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # Methods that validate whether a given configuration is valid.
   module ConfigurationChecks

@@ -1,6 +1,6 @@
 require 'tildeconfig'
 
-include Tildeconfig
+include TildeConfig
 
 describe ConfigurationChecks do
   it 'should validate a valid configuration' do

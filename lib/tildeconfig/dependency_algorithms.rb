@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # Graph algorithms for managing dependencies.
   module DependencyAlgorithms

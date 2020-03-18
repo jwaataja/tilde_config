@@ -18,7 +18,7 @@ require 'tildeconfig/cli'
 require 'tildeconfig/predefined_installers'
 require 'tildeconfig/standard_library'
 
-module Tildeconfig
+module TildeConfig
   class Error < StandardError; end
   # Your code goes here...
 end

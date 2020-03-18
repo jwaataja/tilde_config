@@ -1,6 +1,6 @@
 require 'tildeconfig'
 
-include Tildeconfig
+include TildeConfig
 
 describe Options do
   it 'can parse empty options with correct defaults' do

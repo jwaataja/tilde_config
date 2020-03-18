@@ -1,3 +1,3 @@
-module Tildeconfig
+module TildeConfig
   class DependencyReferenceError < StandardError; end
 end

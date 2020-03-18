@@ -1,6 +1,6 @@
 require 'tildeconfig'
 
-include Tildeconfig
+include TildeConfig
 
 describe DependencyAlgorithms do
   it 'should find a basic cycle' do

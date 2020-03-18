@@ -1,6 +1,6 @@
 require 'optparse'
 
-module Tildeconfig
+module TildeConfig
   ##
   # Stores the options for the current run of the program.
   class Options

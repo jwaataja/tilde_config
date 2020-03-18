@@ -1,6 +1,6 @@
-module Tildeconfig
+module TildeConfig
   ##
-  # Represents an error when a Tildeconfig language construct is used
+  # Represents an error when a TildeConfig language construct is used
   # incorrectly.
   class SyntaxError < StandardError; end
 end

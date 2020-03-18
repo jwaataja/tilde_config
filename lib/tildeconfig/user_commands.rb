@@ -9,7 +9,7 @@ def mod(arg)
   dependencies = []
   if arg.is_a? Hash
     if arg.size != 1
-      raise Tildeconfig::SyntaxError,
+      raise TildeConfig::SyntaxError,
             'Incorrect number of arguments in Hash for mod'
     end
 
@@ -21,9 +21,9 @@ def mod(arg)
   else
     name = arg
   end
-  config = Tildeconfig::Configuration.instance
+  config = TildeConfig::Configuration.instance
   unless config.modules.key?(name)
-    config.modules[name] = Tildeconfig::TildeMod.new(name)
+    config.modules[name] = TildeConfig::TildeMod.new(name)
   end
   m = config.modules[name]
   m.dependencies.merge(dependencies)
@@ -41,8 +41,8 @@ end
 # installer yields to the provided block passing an array of packages. Overrides
 # existing installers with the same name.
 def def_installer(name, &block)
-  config = Tildeconfig::Configuration.instance
-  config.installers[name.to_sym] = Tildeconfig::PackageInstaller.new(&block)
+  config = TildeConfig::Configuration.instance
+  config.installers[name.to_sym] = TildeConfig::PackageInstaller.new(&block)
 end
 
 ##
@@ -51,9 +51,9 @@ end
 # representing the name of the package on that system. Overrides existing
 # package if exists.
 def def_package(name, system_names = {})
-  config = Tildeconfig::Configuration.instance
+  config = TildeConfig::Configuration.instance
   config.system_packages[name] =
-    Tildeconfig::SystemPackage.new(name, system_names)
+    TildeConfig::SystemPackage.new(name, system_names)
 end
 
 # Defines a command with the given name. This command will be callable on
@@ -61,5 +61,5 @@ end
 # itself and the rest of the arguments.
 def def_cmd(name)
   # the given block should take in (module, *other_args)
-  Tildeconfig::TildeMod.define_method(name, ->(*args) { yield(self, *args) })
+  TildeConfig::TildeMod.define_method(name, ->(*args) { yield(self, *args) })
 end

@@ -1,4 +1,4 @@
-module Tildeconfig
+module TildeConfig
   ##
   # Represents the state of one run of the program, including modules,
   # installers, etc. Includes what would normally global variables.

@@ -1,6 +1,6 @@
 require 'set'
 
-module Tildeconfig
+module TildeConfig
   ##
   # Object representing a module in tilde.config. Holds actions, files and
   # dependencies specified for the module.
@@ -142,7 +142,7 @@ module Tildeconfig
     # recursively resolved, in no particular order. Result includes this
     # package.
     def all_dependencies
-      config = Tildeconfig::Configuration.instance
+      config = TildeConfig::Configuration.instance
       res = Set[@name]
       @dependencies.each do |dep|
         res.merge(config.modules[dep].all_dependencies)

@@ -1,6 +1,6 @@
 require "tildeconfig"
 
-include Tildeconfig
+include TildeConfig
 
 describe PackageInstaller do
   it "should call the block given to the constructor correctly" do

@@ -1,3 +1,3 @@
-module Tildeconfig
+module TildeConfig
   VERSION = '0.1.0'
 end

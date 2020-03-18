@@ -2,4 +2,4 @@
 
 require 'tildeconfig'
 
-exit Tildeconfig::CLI.run(ARGV)
+exit TildeConfig::CLI.run(ARGV)

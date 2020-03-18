@@ -5,7 +5,7 @@ require "tildeconfig/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "tildeconfig"
-  spec.version       = Tildeconfig::VERSION
+  spec.version       = TildeConfig::VERSION
   spec.authors       = ["David Ross"]
   spec.email         = ["daboross@daboross.net"]
 
