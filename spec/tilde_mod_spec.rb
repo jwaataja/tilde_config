@@ -122,6 +122,19 @@ describe TildeConfig::TildeMod do
       expect(b_installed).to be_truthy
     end
 
+    it "doesn't run if --skip-dependencies used" do
+      installed = false
+      CLI.run(%w[install a --skip-dependencies], load_config_file: false) do
+        mod :a => [:b]
+        mod :b do |m|
+          m.install do
+            installed = true
+          end
+        end
+      end
+      expect(installed).to be_falsey
+    end
+
     it 'follows multiple levels' do
       Configuration.with_empty_configuration do
         mod :mod1 => [:mod2]

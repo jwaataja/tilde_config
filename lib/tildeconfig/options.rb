@@ -4,12 +4,13 @@ module TildeConfig
   ##
   # Stores the options for the current run of the program.
   class Options
-    attr_accessor :interactive, :system, :packages
+    attr_accessor :interactive, :system, :packages, :skip_dependencies
 
     def initialize
       self.interactive = true
       self.system = nil
       self.packages = false
+      self.skip_dependencies = false
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -37,6 +38,10 @@ module TildeConfig
       parser.on('-p', '--packages',
                 'Attempt to install system package dependencies') do
         self.packages = true
+      end
+      parser.on('--skip-dependencies',
+                "Don't install a module's dependencies") do
+        self.skip_dependencies = true
       end
 
       parser.on_tail('-h', '--help', 'Show this message') do
