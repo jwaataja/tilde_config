@@ -39,7 +39,10 @@ module TildeConfig
         Configuration.with_standard_library do
           found_error = false
           begin
-            load(config_file) if load_config_file
+            # This prevents loading other files in the load path instead of the
+            # intended file.
+            real_path = File.expand_path(config_file)
+            load real_path if load_config_file
           rescue SyntaxError => e
             warn 'Syntax error while reading configuration file:'
             warn e.message
