@@ -1,5 +1,7 @@
 module TildeConfig
-  CONFIG_FILE_NAME = 'tildeconfig'
+  # Array of config file names to serach for, in order of priority with highest
+  # priority first.
+  CONFIG_FILES = %w[tildeconfig tildeconfig.rb].freeze
 
   ##
   # Methods for the tildeconfig command line interface.
@@ -14,9 +16,24 @@ module TildeConfig
       # can serve as a "pseudo" configuration file. Returns true on success,
       # false on failure.
       def run(args, load_config_file: true)
-        if load_config_file && !File.exist?(CONFIG_FILE_NAME)
-          warn "Failed to find config file #{CONFIG_FILE_NAME}"
+        options = Options.new.parse(args)
+        begin
+          options.validate
+        rescue OptionsError => e
+          warn "Invalid options: #{e.message}"
+          found_error = true
+        end
+        return false if found_error
+
+        if args.empty?
+          options.print_help
           return false
+        end
+
+        config_file = nil
+        if load_config_file
+          config_file, found = find_config_file(options)
+          return false unless found
         end
 
         Configuration.with_standard_library do
@@ -33,20 +50,6 @@ module TildeConfig
           yield if block_given?
 
           return false unless validate_configuration
-
-          options = Options.new.parse(args)
-          begin
-            options.validate
-          rescue OptionsError => e
-            warn "Invalid options: #{e.message}"
-            found_error = true
-          end
-          return false if found_error
-
-          if args.empty?
-            options.print_help
-            return false
-          end
 
           command = args[0]
           modules = args.drop(1).map(&:to_sym)
@@ -151,6 +154,38 @@ module TildeConfig
       end
 
       private
+
+      ##
+      # Finds the config file to use. Returns two files. The first is the config
+      # file path or nil if there was no specified config file path and none was
+      # found. The second is true if a config file was found and false if not.
+      # If no config file was found then prints an error message.
+      def find_config_file(options)
+        if !options.config_file.nil?
+          search_default_config_files
+        else
+          unless File.exist?(options.config_file)
+            warn "Failed to find config file #{options.config_file}"
+            return options.config_file, false
+          end
+          [options.config_file, true]
+        end
+        search_default_config_files
+      end
+
+      ##
+      # Searches the default config files to find the first that exists. Returns
+      # the config file and true if it exists, nil and false if none exist in
+      # the current directory. If no config file was found, prints an error
+      # message.
+      def search_default_config_files
+        CONFIG_FILES.each do |config_file|
+          return config_file, true if File.exist?(config_file)
+        end
+
+        warn 'No config file found in current directory'
+        [nil, false]
+      end
 
       ##
       # Validates the current configuration. Returns true on success. Return
