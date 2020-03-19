@@ -39,7 +39,7 @@ module TildeConfig
         Configuration.with_standard_library do
           found_error = false
           begin
-            load(CONFIG_FILE_NAME) if load_config_file
+            load(config_file) if load_config_file
           rescue SyntaxError => e
             warn 'Syntax error while reading configuration file:'
             warn e.message
