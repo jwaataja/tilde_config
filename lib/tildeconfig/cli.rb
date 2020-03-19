@@ -170,7 +170,6 @@ module TildeConfig
           end
           [options.config_file, true]
         end
-        search_default_config_files
       end
 
       ##
