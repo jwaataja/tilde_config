@@ -161,7 +161,7 @@ module TildeConfig
       # found. The second is true if a config file was found and false if not.
       # If no config file was found then prints an error message.
       def find_config_file(options)
-        if !options.config_file.nil?
+        if options.config_file.nil?
           search_default_config_files
         else
           unless File.exist?(options.config_file)
