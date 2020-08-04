@@ -1,3 +1,5 @@
 module TildeConfig
-  class PackageInstallError < StandardError; end
+  ##
+  # Error raised when a system package fails to install.
+  class PackageInstallError < ActionError; end
 end

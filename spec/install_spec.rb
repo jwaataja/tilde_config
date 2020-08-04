@@ -3,7 +3,7 @@ require 'tildeconfig'
 include TildeConfig
 
 describe 'The install command line function' do
-  it 'shoudl return true by default' do
+  it 'should return true by default' do
     expect(CLI.run(%w[install], load_config_file: false)).to be_truthy
   end
 
@@ -113,5 +113,37 @@ describe 'The install command line function' do
       end
     end
     expect(installed).to eq([:mod2, :mod3, :mod1])
+  end
+
+  it 'should stop when an action fails by default' do
+    flag = false
+    CLI.run(%w[install mod1], load_config_file: false) do
+      mod :mod1 do |m|
+        m.install do
+          raise ActionError, ''
+        end
+        m.install do
+          flag = true
+        end
+      end
+    end
+
+    expect(flag).to be_falsey
+  end
+
+  it 'should execute all actions if --ignore-errors passed' do
+    flag = false
+    CLI.run(%w[install mod1 --ignore-errors], load_config_file: false) do
+      mod :mod1 do |m|
+        m.install do
+          raise ActionError, ''
+        end
+        m.install do
+          flag = true
+        end
+      end
+    end
+
+    expect(flag).to be_truthy
   end
 end

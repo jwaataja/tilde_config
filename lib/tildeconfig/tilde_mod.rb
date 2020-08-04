@@ -87,27 +87,42 @@ module TildeConfig
 
     ##
     # Execute the install action for this module now. Raises +FileInstallError+
-    # when a file fails to install. Raises +PackageInstallError+ if a
-    # package fails to install.
+    # when a file fails to install. Raises an +ActionError+ if some action
+    # fails, unless --ignore-errors is specified.
     def execute_install(options)
-      install_system_dependencies(options) if options.packages
-      @files.each { |file| run_file_install(file) }
-      install_cmds.each(&:call)
+      ActionError.print_warn_if_no_ignore(options) do
+        install_system_dependencies(options) if options.packages
+      end
+      files.each do |file|
+        ActionError.print_warn_if_no_ignore(options) do
+          run_file_install(file)
+        end
+      end
+      execute_command_list(install_cmds, options)
     end
 
     ##
-    # Execute the uninstall action for this module now.
-    def execute_uninstall
-      files.each { |file| run_file_uninstall(file) }
-      uninstall_cmds.each(&:call)
+    # Execute the uninstall action for this module now. Raises an +ActionError+
+    # if some action fails, unless --ignore-errors is specified.
+    def execute_uninstall(options)
+      files.each do |file|
+        ActionError.print_warn_if_no_ignore(options) do
+          run_file_uninstall(file)
+        end
+      end
+      execute_command_list(uninstall_cmds, options)
     end
 
     ##
-    # Execute the update action for this module now. Raises +FileInstallError+
-    # when a file failes to install.
-    def execute_update
-      files.each { |file| run_file_install(file) }
-      update_cmds.each(&:call)
+    # Execute the update action for this module now. Raises an +ActionError+ if
+    # some action fails, unless --ignore-errors is specified.
+    def execute_update(options)
+      files.each do |file|
+        ActionError.print_warn_if_no_ignore(options) do
+          run_file_install(file)
+        end
+      end
+      execute_command_list(update_cmds, options)
     end
 
     # TODO: Comment this.
@@ -165,6 +180,21 @@ module TildeConfig
     end
 
     private
+
+    # Takes an enumerable collection of callable objects in +commands+ and
+    # executes them in order. Expects that each command performs one action to
+    # install, update, or remove a module.
+    #
+    # The +options+ parameter is an +Options+ that holds the command line
+    # arguments.
+    #
+    # Raises an +ActionError+ if some action fails, unless --ignore-errors is
+    # specified.
+    def execute_command_list(commands, options)
+      commands.each do |command|
+        ActionError.print_warn_if_no_ignore(options) { command.call }
+      end
+    end
 
     ##
     # Adds +module_name+ and all its dependencies (calculated recursive) to

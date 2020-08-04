@@ -1,3 +1,5 @@
+# Main entry point to the tildeconfig command line interface.
+
 module TildeConfig
   # Array of config file names to serach for, in order of priority with highest
   # priority first.
@@ -41,8 +43,7 @@ module TildeConfig
           begin
             # This prevents loading other files in the load path instead of the
             # intended file.
-            real_path = File.expand_path(config_file)
-            load real_path if load_config_file
+            load File.expand_path(config_file) if load_config_file
           rescue SyntaxError => e
             warn 'Syntax error while reading configuration file:'
             warn e.message
@@ -99,14 +100,9 @@ module TildeConfig
           succeeded = true
           begin
             m.execute_install(options)
-          rescue FileInstallError => e
+          rescue ActionError => e
             warn "Error while installing module #{name}."
-            warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \
-              "#{e.message}"
-            succeeded = false
-          rescue PackageInstallError => e
-            warn "Error while installing module #{name}."
-            warn e.message
+            e.print_warning
             succeeded = false
           end
           return false unless succeeded
@@ -119,7 +115,7 @@ module TildeConfig
       def uninstall(options)
         Configuration.instance.modules.each do |name, m|
           puts "Uninstalling #{name}"
-          m.execute_uninstall
+          m.execute_uninstall(options)
         end
         true
       end
@@ -131,7 +127,7 @@ module TildeConfig
         Configuration.instance.modules.each do |name, m|
           puts "Updating #{name}"
           begin
-            succeeded = m.execute_update
+            succeeded = m.execute_update(options)
           rescue FileInstallError => e
             warn "Error while updating module #{name}."
             warn "Failed to install file #{e.file.src} to #{e.file.dest}: " \

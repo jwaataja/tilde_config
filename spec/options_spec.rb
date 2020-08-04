@@ -6,6 +6,11 @@ describe Options do
   it 'can parse empty options with correct defaults' do
     options = Options.new.parse([])
     expect(options.interactive).to be_truthy
+    expect(options.system).to be_nil
+    expect(options.packages).to be_falsey
+    expect(options.skip_dependencies).to be_falsey
+    expect(options.config_file).to be_nil
+    expect(options.should_ignore_errors).to be_falsey
   end
 
   it 'can turn off interactivity' do

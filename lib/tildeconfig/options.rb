@@ -5,7 +5,7 @@ module TildeConfig
   # Stores the options for the current run of the program.
   class Options
     attr_accessor :interactive, :system, :packages, :skip_dependencies,
-                  :config_file
+                  :config_file, :should_ignore_errors
 
     def initialize
       self.interactive = true
@@ -13,6 +13,7 @@ module TildeConfig
       self.packages = false
       self.skip_dependencies = false
       self.config_file = nil
+      self.should_ignore_errors = false
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -48,6 +49,12 @@ module TildeConfig
       parser.on('-c', '--config-file CONFIG_FILE',
                 'Load the given config file instead of the default') do |c|
         self.config_file = c
+      end
+      parser.on('-i',
+                '--ignore-errors',
+                'Don\'t stop execution if writing to a file or a '\
+                'shell command fails') do |c|
+        self.should_ignore_errors = c
       end
 
       parser.on_tail('-h', '--help', 'Show this message') do
