@@ -1,3 +1,5 @@
+require 'English'
+
 ##
 # Defines a module with the given name if it doesn't already exist. May
 # also instaed pass a hash with a single key whose value is an array of
@@ -31,9 +33,21 @@ def mod(arg)
 end
 
 ##
-# Runs +command+ as a shell command.
+# Runs +command+ as a shell command. May contain multiple lines, each with a
+# command.
+#
+# If the command could not be found, or the command returns a non-zero exit
+# status, raises a +ShellError+.
 def sh(command)
-  system(command)
+  result = system(command)
+  return if result
+
+  raise ShellError.new('Shell command not found', command, true) if result.nil?
+
+  raise ShellError.new('Shell command failed',
+                       command,
+                       false,
+                       exit_status: $CHILD_STATUS)
 end
 
 ##

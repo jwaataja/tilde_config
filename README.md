@@ -117,6 +117,23 @@ Now, when we run `tildeconfig install` this command is run. Notice, now when we
 run `tildeconfig update`, the command is not run because it's only necessary
 when installing.
 
+The `sh` command can accept multiple commands in a string, one per line. Using
+Heredoc functionally allows embedding scripts. For example, this creates a
+`tildeconfig` module that when installed, clones, builds, and installs
+`tildeconfig`.
+```ruby
+mod :tildeconfig do |m|
+  m.install do
+    sh <<~BASH
+      git clone https://github.com/jwaataja/tildeconfig.git
+      cd tildeconfig
+      rake build
+      rake install
+    BASH
+  end
+end
+```
+
 ### System packages
 
 It's useless to install Vim configuration files if Vim isn't installed.
