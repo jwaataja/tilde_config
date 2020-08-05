@@ -1,5 +1,6 @@
 require 'tildeconfig'
 require 'tmpdir'
+require 'fileutils'
 
 describe TildeConfig::TildeMod do
   it 'exists, and has basic methods' do
@@ -23,6 +24,25 @@ describe TildeConfig::TildeMod do
     m.file 'source'
     m.file 'source2', 'destination2'
     expect(m.files.size).to eq(2)
+  end
+
+  it 'can use file_glob with patterns' do
+    m = TildeConfig::TildeMod.new(:test_name)
+    Dir.mktmpdir do |dir|
+      path1 = File.join(dir, 'file1')
+      path2 = File.join(dir, 'file2')
+      FileUtils.touch([path1, path2])
+      m.file_glob "#{dir}/file*"
+      expect(m.files.size).to eq(2)
+    end
+  end
+
+  it 'can use file_glob with a pattern that returns no results' do
+    m = TildeConfig::TildeMod.new(:test_name)
+    Dir.mktmpdir do |dir|
+      m.file_glob "#{dir}/*"
+      expect(m.files).to be_empty
+    end
   end
 
   it 'can define custom methods' do

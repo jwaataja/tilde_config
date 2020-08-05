@@ -168,15 +168,21 @@ module TildeConfig
     ##
     # Adds a file to this module. The source path should be a file path relative
     # to the module root directory. The +dest+ represents the location the file
-    # will be installed, including it's name (it's not just the directory). If
+    # will be installed, including its name (it's not just the directory). If
     # it's relative, then the file is installed relative to the module install
     # directory. If +dest+ is not given, then the file is installed to the same
     # relative path in the module install directory as the source file is in the
     # module root directory.
     def file(src, dest = nil)
       dest = src if dest.nil?
-      file_tuple = TildeFile.new(src, dest)
-      @files << file_tuple
+      @files << TildeFile.new(src, dest)
+    end
+
+    ##
+    # Like +file+, except +src+ is a glob pattern. For each matching file, same
+    # as calling +file+ with the matched path and same +dest+.
+    def file_glob(src_pattern, dest = nil)
+      Dir.glob(src_pattern) { |src| file(src, dest) }
     end
 
     private
@@ -288,13 +294,17 @@ module TildeConfig
     ##
     # Returns the full source path for the given +TildeFile+.
     def src_path(file_tuple)
-      File.join(@root_dir, file_tuple.src)
+      if File.absolute_path?(file_tuple.src)
+        file_tuple.src
+      else
+        File.join(@root_dir, file_tuple.src)
+      end
     end
 
     ##
     # Returns the full destination path for the given +TildeFile+.
     def dest_path(file_tuple)
-      if Pathname.new(file_tuple.dest).absolute?
+      if File.absolute_path?(file_tuple.dest)
         file_tuple.dest
       else
         File.join(@install_dir, file_tuple.dest)

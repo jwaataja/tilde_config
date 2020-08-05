@@ -87,6 +87,16 @@ mod :vim do |m|
 end
 ```
 
+To use a file glob pattern, use the `file_glob` command instead of `file`. It
+behaves the same except for the source it accepts a shell glob pattern instead
+of the path to a regular file. For example, this copies all files ending in
+`.vim` to a directory.
+```ruby
+mod :vim do |m|
+  m.file_glob "*.vim" ".vim/after/ftplugin/c.vim"
+end
+```
+
 ### Actions
 
 The `tildeconfig` command line program can do more than install modules. It can
