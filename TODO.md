@@ -1,2 +1,1 @@
 - Stop tests from writing to stdout.
-- Add continuous integration.
