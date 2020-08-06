@@ -1,3 +1,2 @@
 - Stop tests from writing to stdout.
-- Add RuboCop configuration file.
 - Add continuous integration.
