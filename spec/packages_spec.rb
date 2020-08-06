@@ -42,7 +42,9 @@ module TildeConfig
           m.pkg_dep 'package1', 'package2'
         end
         m = config.modules[:my_mod]
-        m.execute_install(Options.new.parse(%w[--packages --system my_installer]))
+        m.execute_install(
+          Options.new.parse(%w[--packages --system my_installer])
+        )
         expect(args).to eq(%w[package1 package2])
       end
     end
@@ -59,7 +61,9 @@ module TildeConfig
           m.pkg_dep 'test_package'
         end
         m = config.modules[:my_mod]
-        m.execute_install(Options.new.parse(%w[--packages --system my_installer]))
+        m.execute_install(
+          Options.new.parse(%w[--packages --system my_installer])
+        )
         expect(args).to eq(%w[test_package])
       end
     end
@@ -76,7 +80,9 @@ module TildeConfig
           m.pkg_dep 'test_package'
         end
         m = config.modules[:my_mod]
-        m.execute_install(Options.new.parse(%w[--packages --system my_installer]))
+        m.execute_install(
+          Options.new.parse(%w[--packages --system my_installer])
+        )
         expect(args).to eq(%w[other_name])
       end
     end
