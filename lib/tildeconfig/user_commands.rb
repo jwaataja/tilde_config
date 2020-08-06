@@ -15,11 +15,7 @@ def mod(arg)
             'Incorrect number of arguments in Hash for mod'
     end
 
-    arg.each do |k, v|
-      name = k
-      dependencies = v
-      break
-    end
+    name, dependencies = arg.first
   else
     name = arg
   end
