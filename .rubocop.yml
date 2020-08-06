@@ -1,0 +1,34 @@
+Layout/LineLength:
+    Max: 80
+
+Metrics/AbcSize:
+    Enabled: false
+
+Metrics/PerceivedComplexity:
+    Enabled: false
+
+Metrics/ClassLength:
+    Max: 1000
+
+Metrics/ModuleLength:
+    Max: 1000
+
+Metrics/BlockLength:
+    Max: 300
+
+Metrics/CyclomaticComplexity:
+    Enabled: false
+
+Metrics/MethodLength:
+    Max: 100
+
+Style/FrozenStringLiteralComment:
+    Enabled: false
+
+AllCops:
+    Exclude:
+        - 'Gemfile'
+        - 'tildeconfig.gemspec'
+        - 'Rakefile'
+        - 'vendor/**/*'
+        - 'bin/*'

@@ -142,7 +142,7 @@ module TildeConfig
       ##
       # Refreshs the files of all given modules. If +modules+ is empty, then
       # refreshes all modules.
-      def refresh(modules, options)
+      def refresh(modules, _options)
         config = Configuration.instance
         modules = Configuration.instance.modules.keys if modules.empty?
         modules.each do |name|

@@ -1,0 +1,8 @@
+inherit_from: ../.rubocop.yml
+
+# Following options work better with the TildeConfig DSL.
+Style/HashSyntax:
+    Enabled: false
+
+Style/SymbolArray:
+    Enabled: false
