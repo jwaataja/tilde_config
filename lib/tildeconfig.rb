@@ -2,6 +2,7 @@ require 'tildeconfig/version'
 require 'tildeconfig/tilde_file'
 require 'tildeconfig/options_error'
 require 'tildeconfig/action_error'
+require 'tildeconfig/shell_error'
 require 'tildeconfig/package_install_error'
 require 'tildeconfig/dependency_reference_error'
 require 'tildeconfig/circular_dependency_error'
@@ -19,7 +20,6 @@ require 'tildeconfig/user_commands'
 require 'tildeconfig/cli'
 require 'tildeconfig/predefined_installers'
 require 'tildeconfig/standard_library'
-require 'tildeconfig/shell_error'
 
 module TildeConfig
   class Error < StandardError; end

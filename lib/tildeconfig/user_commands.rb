@@ -42,12 +42,14 @@ def sh(command)
   result = system(command)
   return if result
 
-  raise ShellError.new('Shell command not found', command, true) if result.nil?
+  if result.nil?
+    raise TildeConfig::ShellError.new('Shell command not found', command, true)
+  end
 
-  raise ShellError.new('Shell command failed',
-                       command,
-                       false,
-                       exit_status: $CHILD_STATUS)
+  raise TildeConfig::ShellError.new('Shell command failed',
+                                    command,
+                                    false,
+                                    exit_status: $CHILD_STATUS)
 end
 
 ##
