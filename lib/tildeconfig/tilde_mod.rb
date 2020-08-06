@@ -95,7 +95,7 @@ module TildeConfig
       end
       files.each do |file|
         ActionError.print_warn_if_no_ignore(options) do
-          run_file_install(file)
+          run_file_install(file, options)
         end
       end
       execute_command_list(install_cmds, options)
@@ -119,7 +119,7 @@ module TildeConfig
     def execute_update(options)
       files.each do |file|
         ActionError.print_warn_if_no_ignore(options) do
-          run_file_install(file)
+          run_file_install(file, options)
         end
       end
       execute_command_list(update_cmds, options)
@@ -185,6 +185,12 @@ module TildeConfig
       Dir.glob(src_pattern) { |src| file(src, dest) }
     end
 
+    ##
+    # Same as file, but expects a directory as the source.
+    def directory(src, dest = nil)
+      file(src, dest)
+    end
+
     private
 
     # Takes an enumerable collection of callable objects in +commands+ and
@@ -219,12 +225,17 @@ module TildeConfig
     ##
     # Method run to install a file. Used by TildeMod.file. Rasises an
     # +FileInstallError+ on failure.
-    def run_file_install(file_tuple)
+    def run_file_install(file_tuple, options)
       # TODO: this assumes that our working directory will always be the user's
       # settings repository.
       src = src_path(file_tuple)
       dest = dest_path(file_tuple)
-      FileInstallUtils.install(file_tuple, src, dest)
+      FileInstallUtils.install(
+        file_tuple,
+        src,
+        dest,
+        merge_strategy: options.directory_merge_strategy
+      )
     end
 
     ##

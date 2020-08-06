@@ -3,6 +3,9 @@ require 'tmpdir'
 require 'fileutils'
 
 describe TildeConfig::TildeMod do
+  # TODO: Change tests to use the subject.
+  subject!(:m) { TildeConfig::TildeMod.new(:test_name) }
+
   it 'exists, and has basic methods' do
     m = TildeConfig::TildeMod.new(:test_name)
     m.install do
@@ -124,6 +127,66 @@ describe TildeConfig::TildeMod do
         m.file 'input', dest_path
         m.execute_install(TildeConfig::Options.new)
         expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
+      end
+    end
+
+    it 'can install a directory and merge by default' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src_dir')
+        src_subdir = File.join(src_dir, 'subdir')
+        src_file1 = File.join(src_dir, 'file1')
+        src_file2 = File.join(src_subdir, 'file2')
+        Dir.mkdir(src_dir)
+        Dir.mkdir(src_subdir)
+        File.write(src_file1, 'contents1')
+        File.write(src_file2, 'contents2')
+        dest_dir = File.join(dir, 'dest_dir')
+        FileUtils.mkdir(dest_dir)
+        dest_subdir = File.join(dest_dir, 'subdir')
+        dest_file1 = File.join(dest_dir, 'file1')
+        dest_file2 = File.join(dest_subdir, 'file2')
+        dest_file3 = File.join(dest_dir, 'file3')
+        File.write(dest_file3, 'contents3')
+        CLI.run(%w[install m], load_config_file: false) do
+          mod :m do |m|
+            m.root_dir dir
+            m.install_dir dir
+            m.directory 'src_dir', 'dest_dir'
+          end
+        end
+        expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
+        expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
+        expect(File.exist?(dest_file3)).to be_truthy
+      end
+    end
+
+    it 'can install a directory and use override option' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src_dir')
+        src_subdir = File.join(src_dir, 'subdir')
+        src_file1 = File.join(src_dir, 'file1')
+        src_file2 = File.join(src_subdir, 'file2')
+        Dir.mkdir(src_dir)
+        Dir.mkdir(src_subdir)
+        File.write(src_file1, 'contents1')
+        File.write(src_file2, 'contents2')
+        dest_dir = File.join(dir, 'dest_dir')
+        FileUtils.mkdir(dest_dir)
+        dest_subdir = File.join(dest_dir, 'subdir')
+        dest_file1 = File.join(dest_dir, 'file1')
+        dest_file2 = File.join(dest_subdir, 'file2')
+        dest_file3 = File.join(dest_dir, 'file3')
+        File.write(dest_file3, 'contents3')
+        CLI.run(%w[install m], load_config_file: false) do
+          mod :m do |m|
+            m.root_dir dir
+            m.install_dir dir
+            m.directory 'src_dir', 'dest_dir'
+          end
+        end
+        expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
+        expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
+        expect(File.exist?(dest_file3)).to be_truthy
       end
     end
   end

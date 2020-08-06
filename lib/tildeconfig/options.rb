@@ -7,6 +7,10 @@ module TildeConfig
     attr_accessor :interactive, :system, :packages, :skip_dependencies,
                   :config_file, :should_ignore_errors
 
+    ##
+    # Should be a symbol with either the value :override or :merge
+    attr_accessor :directory_merge_strategy
+
     def initialize
       self.interactive = true
       self.system = nil
@@ -14,6 +18,7 @@ module TildeConfig
       self.skip_dependencies = false
       self.config_file = nil
       self.should_ignore_errors = false
+      self.directory_merge_strategy = :merge
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -56,6 +61,14 @@ module TildeConfig
                 'shell command fails') do |c|
         self.should_ignore_errors = c
       end
+      parser.on(
+        '-m',
+        '--directory-merge-strategy STRATEGY',
+        'Strategy for installing directories, should be either "override" or ' \
+        '"merge". Default "override".'
+      ) do |strategy|
+        self.directory_merge_strategy = strategy.to_sym
+      end
 
       parser.on_tail('-h', '--help', 'Show this message') do
         puts parser
@@ -95,6 +108,12 @@ module TildeConfig
       config = Configuration.instance
       if @system && !config.installers.key?(@system)
         raise OptionsError.new("Unknown system #{system}", self)
+      end
+
+      if directory_merge_strategy != :override &&
+         directory_merge_strategy != :merge
+        raise OptionsError.new('The --directory-merge-strategy only accepts ' \
+                               '"override" and "merge"', self)
       end
     end
   end

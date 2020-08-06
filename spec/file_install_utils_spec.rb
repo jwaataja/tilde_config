@@ -64,12 +64,41 @@ describe FileInstallUtils do
       File.write(src_file1, 'contents1')
       File.write(src_file2, 'contents2')
       dest_dir = File.join(dir, 'dest_dir')
+      FileUtils.mkdir(dest_dir)
       dest_subdir = File.join(dest_dir, 'subdir')
       dest_file1 = File.join(dest_dir, 'file1')
       dest_file2 = File.join(dest_subdir, 'file2')
-      FileInstallUtils.install(nil, src_dir, dest_dir)
+      dest_file3 = File.join(dest_dir, 'file3')
+      File.write(dest_file3, 'contents3')
+      FileInstallUtils.install(nil, src_dir, dest_dir, merge_strategy: :merge)
       expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
       expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
+      expect(File.exist?(dest_file3)).to be_truthy
+    end
+  end
+
+  it 'overrides directories when override merge strategy specified' do
+    Dir.mktmpdir do |dir|
+      src_dir = File.join(dir, 'src_dir')
+      src_subdir = File.join(src_dir, 'subdir')
+      src_file1 = File.join(src_dir, 'file1')
+      src_file2 = File.join(src_subdir, 'file2')
+      Dir.mkdir(src_dir)
+      Dir.mkdir(src_subdir)
+      File.write(src_file1, 'contents1')
+      File.write(src_file2, 'contents2')
+      dest_dir = File.join(dir, 'dest_dir')
+      FileUtils.mkdir(dest_dir)
+      dest_subdir = File.join(dest_dir, 'subdir')
+      dest_file1 = File.join(dest_dir, 'file1')
+      dest_file2 = File.join(dest_subdir, 'file2')
+      dest_file3 = File.join(dest_dir, 'file3')
+      File.write(dest_file3, 'contents3')
+      FileInstallUtils.install(nil, src_dir, dest_dir,
+                               merge_strategy: :override)
+      expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
+      expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
+      expect(File.exist?(dest_file3)).to be_falsey
     end
   end
 

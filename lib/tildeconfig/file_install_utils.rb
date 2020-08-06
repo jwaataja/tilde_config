@@ -7,14 +7,20 @@ module TildeConfig
       # Installs the file or directory at +src_path+ to +dest_path+. Raises a
       # +FileInstallError+ if the file at +src_path+ does not exist or if
       # there's an error while installing.
-      def install(file_tuple, src_path, dest_path)
+      #
+      # The +merge_strategy+ should be a symbol that's either +:override+ or
+      # +:merge+. The +:override+ value installs directories by writing over the
+      # destination. The +:merge+ option recursively merges directories so that
+      # the file structure of the src is spliced into the destination directory.
+      def install(file_tuple, src_path, dest_path, merge_strategy: :merge)
+        check_merge_strategy(merge_strategy)
         ensure_install_directory_exists(file_tuple, dest_path)
         check_src_file_exists(file_tuple, src_path)
 
         if File.file?(src_path)
           install_file(file_tuple, src_path, dest_path)
         elsif File.directory?(src_path)
-          install_directory(file_tuple, src_path, dest_path)
+          install_directory(file_tuple, src_path, dest_path, merge_strategy)
         end
       end
 
@@ -65,14 +71,18 @@ module TildeConfig
       ##
       # Installs the directory at +src_path+ to +dest_path+. Raises a
       # +FileInstallError+ if the destination exists and is not a directory.
-      def install_directory(file_tuple, src_path, dest_path)
-        unless File.exist?(dest_path)
-          FileUtils.cp_r(src_path, dest_path)
-          return
+      def install_directory(file_tuple, src_path, dest_path, merge_strategy)
+        check_merge_strategy(merge_strategy)
+        if File.exist?(dest_path)
+          check_dest_is_directory(file_tuple, src_path, dest_path)
+          FileUtils.rm_rf(dest_path) if merge_strategy == :override
         end
 
-        check_dest_is_directory(file_tuple, src_path, dest_path)
-        merge_directories(file_tuple, src_path, dest_path)
+        if merge_strategy == :override || !File.exist?(dest_path)
+          FileUtils.cp_r(src_path, dest_path)
+        else
+          merge_directories(file_tuple, src_path, dest_path, merge_strategy)
+        end
       end
 
       ##
@@ -91,14 +101,25 @@ module TildeConfig
       ##
       # Installs all entries in the directory at +src_path+ to the directory at
       # +dest_path+. Raises a +FileInstallError+ if any entry fails to install.
-      def merge_directories(file_tuple, src_path, dest_path)
+      def merge_directories(file_tuple, src_path, dest_path, merge_strategy)
+        check_merge_strategy(merge_strategy)
         Dir.entries(src_path).each do |entry|
           next if %w[. ..].include?(entry)
 
           child_src_path = File.join(src_path, entry)
           child_dest_path = File.join(dest_path, entry)
-          install(file_tuple, child_src_path, child_dest_path)
+          install(file_tuple, child_src_path, child_dest_path,
+                  merge_strategy: merge_strategy)
         end
+      end
+
+      ##
+      # Verifies that +merge_strategy+ is either +:override+ or +:merge+. Raises
+      # an error if not.
+      def check_merge_strategy(merge_strategy)
+        return unless merge_strategy != :override && merge_strategy != :merge
+
+        raise StandardError, "Invalid merge strategy: #{merge_strategy}"
       end
     end
   end

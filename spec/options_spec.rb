@@ -11,6 +11,7 @@ describe Options do
     expect(options.skip_dependencies).to be_falsey
     expect(options.config_file).to be_nil
     expect(options.should_ignore_errors).to be_falsey
+    expect(options.directory_merge_strategy).to eq(:merge)
   end
 
   it 'can turn off interactivity' do
@@ -40,6 +41,12 @@ describe Options do
 
   it 'validate should detect invalid systems' do
     options = Options.new.parse(%w[--system fake-system])
+    expect { options.validate }.to raise_error(OptionsError)
+  end
+
+  it 'validate should ensure --directory-merge-strategy is only called with ' \
+      'valid options' do
+    options = Options.new.parse(%w[--directory-merge-strategy invalid])
     expect { options.validate }.to raise_error(OptionsError)
   end
 end
