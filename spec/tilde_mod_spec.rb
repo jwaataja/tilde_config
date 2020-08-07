@@ -35,8 +35,47 @@ module TildeConfig
         path1 = File.join(dir, 'file1')
         path2 = File.join(dir, 'file2')
         FileUtils.touch([path1, path2])
-        m.file_glob "#{dir}/file*"
+        m.root_dir dir
+        m.install_dir File.join(dir, 'dest_dir')
+        m.file_glob 'file*'
         expect(m.files.size).to eq(2)
+        m.files.each do |f|
+          expect(f.src).to match(/\Afile[12]\Z/)
+          expect(f.dest).to match(/\Afile[12]\Z/)
+        end
+      end
+    end
+
+    it 'expands glob patterns from the src_dir' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src_dir')
+        FileUtils.mkdir(src_dir)
+        path1 = File.join(src_dir, 'file1')
+        path2 = File.join(src_dir, 'file2')
+        FileUtils.touch([path1, path2])
+        m.root_dir dir
+        m.file_glob 'src_dir/file*'
+        expect(m.files.size).to eq(2)
+        m.files.each do |f|
+          expect(f.src).to match(%r{\Asrc_dir/file[12]\Z})
+          expect(f.dest).to match(%r{\Asrc_dir/file[12]\Z})
+        end
+      end
+    end
+
+    it 'installs glob files to the correct directory' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src_dir')
+        FileUtils.mkdir(src_dir)
+        path1 = File.join(src_dir, 'file1')
+        path2 = File.join(src_dir, 'file2')
+        FileUtils.touch([path1, path2])
+        m.root_dir dir
+        m.file_glob 'src_dir/file*', 'dest_dir'
+        expect(m.files.size).to eq(2)
+        m.files.each do |f|
+          expect(f.dest).to match(%r{\Adest_dir/file[12]\Z})
+        end
       end
     end
 

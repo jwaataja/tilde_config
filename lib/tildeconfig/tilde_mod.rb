@@ -11,8 +11,12 @@ module TildeConfig
 
     private_constant :DEFAULT_INSTALL_DIR
 
-    attr_reader :name, :install_cmds, :uninstall_cmds, :update_cmds, :files,
+    attr_reader :name, :install_cmds, :uninstall_cmds, :update_cmds,
                 :package_dependencies, :dependencies
+
+    ##
+    # Array of +TildeFile+ objects to install.
+    attr_reader :files
 
     ##
     # Constructs a new module with the given name. The +dependencies+
@@ -168,21 +172,36 @@ module TildeConfig
     ##
     # Adds a file to this module. The source path should be a file path relative
     # to the module root directory. The +dest+ represents the location the file
-    # will be installed, including its name (it's not just the directory). If
-    # it's relative, then the file is installed relative to the module install
-    # directory. If +dest+ is not given, then the file is installed to the same
-    # relative path in the module install directory as the source file is in the
-    # module root directory.
+    # will be installed, including its basename (it's not just the directory).
+    # If it's relative, then the file is installed relative to the module
+    # install directory. If +dest+ is not given, then the file is installed to
+    # the same relative path in the module install directory as the source file
+    # is in the module root directory.
     def file(src, dest = nil)
       dest = src if dest.nil?
       @files << TildeFile.new(src, dest)
     end
 
     ##
-    # Like +file+, except +src+ is a glob pattern. For each matching file, same
-    # as calling +file+ with the matched path and same +dest+.
-    def file_glob(src_pattern, dest = nil)
-      Dir.glob(src_pattern) { |src| file(src, dest) }
+    # Takes a shell glob pattern string +src_pattern+ and an optional
+    # destination directory path +dest_dir+.
+    #
+    # Adds each file matching +src_pattern+. If +dest_dir+ is given, then
+    # installs each file directly into +dest_dir+ with the same basename as the
+    # source file. If +dest_dir+ is not given, then installs into the default
+    # installation directory with the same relative path as the source file.
+    #
+    # Relative paths are resolved relative to the result of +root_dir+, so set
+    # it before calling this method.
+    def file_glob(src_pattern, dest_dir = nil)
+      Dir.glob(src_pattern, base: @root_dir) do |src|
+        dest_path = if dest_dir.nil?
+                      src
+                    else
+                      File.join(dest_dir, File.basename(src))
+                    end
+        file(src, dest_path)
+      end
     end
 
     ##

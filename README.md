@@ -88,12 +88,16 @@ end
 ```
 
 To use a file glob pattern, use the `file_glob` command instead of `file`. It
-behaves the same except for the source it accepts a shell glob pattern instead
-of the path to a regular file. For example, this copies all files ending in
-`.vim` to a directory.
+installs each file matching a shell glob pattern. If you pass it a destination
+directory, then it installs it to that directory directly with the same basename
+as the source file. If no destination directory is given, it installs to the
+same relative source path in the installation directory as the source file.
+
+For example, this installs all files ending in `.vim` to the directory
+`~/.vim/after/ftluping`.
 ```ruby
 mod :vim do |m|
-  m.file_glob "*.vim" ".vim/after/ftplugin/c.vim"
+  m.file_glob "*.vim" ".vim/after/ftplugin"
 end
 ```
 
