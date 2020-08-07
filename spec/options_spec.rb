@@ -9,6 +9,7 @@ module TildeConfig
       expect(options.config_file).to be_nil
       expect(options.should_ignore_errors).to be_falsey
       expect(options.directory_merge_strategy).to eq(:merge)
+      expect(options.no_override).to be_falsey
     end
 
     it 'can turn off interactivity' do
