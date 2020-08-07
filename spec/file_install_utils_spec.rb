@@ -145,5 +145,49 @@ module TildeConfig
           .to raise_error(FileInstallError)
       end
     end
+
+    it 'doesn\'t install a regular file when --no-override specified' do
+      Dir.mktmpdir do |dir|
+        src_path = File.join(dir, 'input')
+        dest_path = File.join(dir, 'output')
+        File.write(src_path, 'test contents')
+        File.write(dest_path, 'test contents')
+        expect do
+          FileInstallUtils.install(nil, src_path, dest_path,
+                                   should_override: false)
+        end.to raise_error(FileInstallError)
+      end
+    end
+
+    it 'doesn\'t install a directory when --no-override specified' do
+      Dir.mktmpdir do |dir|
+        src_path = File.join(dir, 'input')
+        dest_path = File.join(dir, 'output')
+        FileUtils.mkdir(src_path)
+        FileUtils.mkdir(dest_path)
+        expect do
+          FileInstallUtils.install(nil, src_path, dest_path,
+                                   should_override: false)
+        end.to raise_error(FileInstallError)
+      end
+    end
+
+    it 'applies --no-override to elements of a directory when merging' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'input')
+        dest_dir = File.join(dir, 'output')
+        src_path = File.join(src_dir, 'file')
+        dest_path = File.join(src_dir, 'file')
+        FileUtils.mkdir(src_dir)
+        FileUtils.mkdir(dest_dir)
+        File.write(src_path, 'test contents')
+        File.write(dest_path, 'test contents')
+        expect do
+          FileInstallUtils.install(nil, src_dir, dest_dir,
+                                   merge_strategy: :merge,
+                                   should_override: false)
+        end.to raise_error(FileInstallError)
+      end
+    end
   end
 end

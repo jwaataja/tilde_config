@@ -253,7 +253,8 @@ module TildeConfig
         file_tuple,
         src,
         dest,
-        merge_strategy: options.directory_merge_strategy
+        merge_strategy: options.directory_merge_strategy,
+        should_override: options.should_override
       )
     end
 

@@ -1,5 +1,7 @@
 # General
-- Add option that prevents overriding any existing files.
+- Ensure the return value of `CLI.run` is always checked in tests.
+- Switch options to use options like `--[no-]-override` rather than just
+  `--no-override`.
 
 # Documentation
 - Document the command line options.

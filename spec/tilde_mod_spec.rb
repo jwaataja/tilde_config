@@ -228,6 +228,45 @@ module TildeConfig
           expect(File.exist?(dest_file3)).to be_truthy
         end
       end
+
+      it 'respects the --no-override option for regular files' do
+        Dir.mktmpdir do |dir|
+          src_path = File.join(dir, 'input')
+          dest_path = File.join(dir, 'output')
+          File.write(src_path, 'src contents')
+          File.write(dest_path, 'dest contents')
+          TildeConfigSpec.run(%w[install mod1 --no-override],
+                              suppress_output: false) do
+            mod :mod1 do |m|
+              m.root_dir dir
+              m.install_dir dir
+
+              m.file 'input', 'output'
+            end
+          end
+
+          expect(File.read(dest_path)).to eq('dest contents')
+        end
+      end
+
+      it 'respects the --no-override option for directories' do
+        Dir.mktmpdir do |dir|
+          src_dir = File.join(dir, 'input')
+          dest_dir = File.join(dir, 'output')
+          FileUtils.mkdir(src_dir)
+          FileUtils.mkdir(dest_dir)
+          File.write(File.join(src_dir, 'file'), 'contents')
+          TildeConfigSpec.run(%w[install mod1 --no-override]) do
+            mod :mod1 do |m|
+              m.root_dir dir
+              m.install_dir dir
+              m.directory 'input', 'output'
+            end
+          end
+
+          expect(Dir.empty?(dest_dir)).to be_truthy
+        end
+      end
     end
 
     describe 'all_dependencies' do

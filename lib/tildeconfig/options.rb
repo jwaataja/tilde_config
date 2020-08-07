@@ -5,7 +5,7 @@ module TildeConfig
   # Stores the options for the current run of the program.
   class Options
     attr_accessor :interactive, :system, :packages, :skip_dependencies,
-                  :config_file, :should_ignore_errors, :no_override
+                  :config_file, :should_ignore_errors, :should_override
 
     ##
     # Should be a symbol with either the value :override or :merge
@@ -19,7 +19,7 @@ module TildeConfig
       self.config_file = nil
       self.should_ignore_errors = false
       self.directory_merge_strategy = :merge
-      self.no_override = false
+      self.should_override = true
       @parser = OptionParser.new do |parser|
         define_options(parser)
       end
@@ -70,8 +70,8 @@ module TildeConfig
       ) do |strategy|
         self.directory_merge_strategy = strategy.to_sym
       end
-      parser.on('--no-override', 'Never override an existing file') do |c|
-        self.no_override = c
+      parser.on('--[no-]override', 'Whether to override existing files') do |c|
+        self.should_override = c
       end
 
       parser.on_tail('-h', '--help', 'Show this message') do
