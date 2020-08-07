@@ -1,7 +1,5 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe 'The mod command' do
+  RSpec.describe 'The mod command' do
     it 'should define a module when passed nothing' do
       Configuration.with_standard_library do
         config = Configuration.instance

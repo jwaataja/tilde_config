@@ -1,13 +1,12 @@
-require 'tildeconfig'
 require 'tmpdir'
 require 'fileutils'
 
 module TildeConfig
-  describe 'Running shell commands' do
+  RSpec.describe 'Running shell commands' do
     it 'should be able to run a simple command' do
       Dir.mktmpdir do |dir|
         path = File.join(dir, 'shell_test_file')
-        CLI.run(%w[install mod1], load_config_file: false) do
+        TildeConfigSpec.run(%w[install mod1]) do
           mod :mod1 do |m|
             m.install do
               sh "touch #{path}"
@@ -23,7 +22,7 @@ module TildeConfig
       Dir.mktmpdir do |dir|
         path1 = File.join(dir, 'file1')
         path2 = File.join(dir, 'file2')
-        CLI.run(%w[install mod1], load_config_file: false) do
+        TildeConfigSpec.run(%w[install mod1]) do
           mod :mod1 do |m|
             m.install do
               sh <<~BASH
@@ -42,10 +41,10 @@ module TildeConfig
     it 'should not execute a second command if the first fails' do
       Dir.mktmpdir do |dir|
         path = File.join(dir, 'shell_test_file')
-        CLI.run(%w[install mod1], load_config_file: false) do
+        TildeConfigSpec.run(%w[install mod1]) do
           mod :mod1 do |m|
             m.install do
-              sh 'return 1'
+              sh 'false'
             end
 
             m.install do
@@ -58,13 +57,13 @@ module TildeConfig
       end
     end
 
-    it 'should all commands regardless of errors --ignore-errors passed' do
+    it 'should run all commands if --ignore-errors passed' do
       Dir.mktmpdir do |dir|
         path = File.join(dir, 'shell_test_file')
-        CLI.run(%w[install mod1 --ignore-errors], load_config_file: false) do
+        TildeConfigSpec.run(%w[install mod1 --ignore-errors]) do
           mod :mod1 do |m|
             m.install do
-              sh 'return 1'
+              sh 'false'
             end
 
             m.install do

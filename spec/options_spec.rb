@@ -1,7 +1,5 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe Options do
+  RSpec.describe Options do
     it 'can parse empty options with correct defaults' do
       options = Options.new.parse([])
       expect(options.interactive).to be_truthy

@@ -1,16 +1,14 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe 'The install command line function' do
+  RSpec.describe 'The install command line function' do
     it 'should return true by default' do
-      expect(CLI.run(%w[install], load_config_file: false)).to be_truthy
+      expect(TildeConfigSpec.run(%w[install])).to be_truthy
     end
 
     it 'should run install actions' do
       install1_called = false
       install2_called = false
       install3_called = false
-      CLI.run(%w[install], load_config_file: false) do
+      TildeConfigSpec.run(%w[install]) do
         mod :mod1 do |m|
           m.install do
             install1_called = true
@@ -36,7 +34,7 @@ module TildeConfig
       install1_called = false
       install2_called = false
       install3_called = false
-      CLI.run(%w[install mod1 mod3], load_config_file: false) do
+      TildeConfigSpec.run(%w[install mod1 mod3]) do
         mod :mod1 do |m|
           m.install do
             install1_called = true
@@ -62,13 +60,13 @@ module TildeConfig
     end
 
     it 'should detect unknown modules' do
-      result = CLI.run(%w[install fake_mod], load_config_file: false)
+      result = TildeConfigSpec.run(%w[install fake_mod])
       expect(result).to be_falsey
     end
 
     it 'should install modules in the correct order' do
       installed = []
-      CLI.run(%w[install], load_config_file: false) do
+      TildeConfigSpec.run(%w[install]) do
         mod :mod1 => [:mod2, :mod3] do |m|
           m.install do
             installed << :mod1
@@ -92,7 +90,7 @@ module TildeConfig
 
     it 'should install dependent modules' do
       installed = []
-      CLI.run(%w[install mod1], load_config_file: false) do
+      TildeConfigSpec.run(%w[install mod1]) do
         mod :mod1 => [:mod2, :mod3] do |m|
           m.install do
             installed << :mod1
@@ -116,7 +114,7 @@ module TildeConfig
 
     it 'should stop when an action fails by default' do
       flag = false
-      CLI.run(%w[install mod1], load_config_file: false) do
+      TildeConfigSpec.run(%w[install mod1]) do
         mod :mod1 do |m|
           m.install do
             raise ActionError, ''
@@ -132,7 +130,7 @@ module TildeConfig
 
     it 'should execute all actions if --ignore-errors passed' do
       flag = false
-      CLI.run(%w[install mod1 --ignore-errors], load_config_file: false) do
+      TildeConfigSpec.run(%w[install mod1 --ignore-errors]) do
         mod :mod1 do |m|
           m.install do
             raise ActionError, ''

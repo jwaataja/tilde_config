@@ -1,1 +1,2 @@
 - Stop tests from writing to stdout.
+- Add option that prevents overriding any existing files.

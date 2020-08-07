@@ -1,14 +1,15 @@
-require 'tildeconfig'
 require 'tmpdir'
 
 module TildeConfig
-  describe FileInstallUtils do
+  RSpec.describe FileInstallUtils do
     it 'can install regular files' do
       Dir.mktmpdir do |dir|
         src_path = File.join(dir, 'input')
         dest_path = File.join(dir, 'output')
         File.write(src_path, 'test contents')
-        FileInstallUtils.install(nil, src_path, dest_path)
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(nil, src_path, dest_path)
+        end
         expect(File.exist?(dest_path)).to be_truthy
         expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
       end
@@ -29,7 +30,9 @@ module TildeConfig
         dest_path = File.join(dir, 'dest_dir', 'output')
         FileUtils.mkdir(File.join(dir, 'src_dir'))
         File.write(src_path, 'test contents')
-        FileInstallUtils.install(nil, src_path, dest_path)
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(nil, src_path, dest_path)
+        end
         expect(File.exist?(dest_path)).to be_truthy
         expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
       end
@@ -46,7 +49,9 @@ module TildeConfig
         dest_dir = File.join(dir, 'dest_dir')
         dest_file1 = File.join(dest_dir, 'file1')
         dest_file2 = File.join(dest_dir, 'file2')
-        FileInstallUtils.install(nil, src_dir, dest_dir)
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(nil, src_dir, dest_dir)
+        end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
       end
@@ -69,7 +74,10 @@ module TildeConfig
         dest_file2 = File.join(dest_subdir, 'file2')
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
-        FileInstallUtils.install(nil, src_dir, dest_dir, merge_strategy: :merge)
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(nil, src_dir, dest_dir,
+                                   merge_strategy: :merge)
+        end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
         expect(File.exist?(dest_file3)).to be_truthy
@@ -93,8 +101,10 @@ module TildeConfig
         dest_file2 = File.join(dest_subdir, 'file2')
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
-        FileInstallUtils.install(nil, src_dir, dest_dir,
-                                 merge_strategy: :override)
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(nil, src_dir, dest_dir,
+                                   merge_strategy: :override)
+        end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
         expect(File.exist?(dest_file3)).to be_falsey

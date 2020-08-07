@@ -1,7 +1,5 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe ConfigurationChecks do
+  RSpec.describe ConfigurationChecks do
     it 'should validate a valid configuration' do
       Configuration.with_empty_configuration do
         mod :mod1 => [:mod2]

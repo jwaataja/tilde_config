@@ -1,7 +1,5 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe SystemPackage do
+  RSpec.describe SystemPackage do
     it 'should remember its system names correctly' do
       name = 'test name'
       package = SystemPackage.new(name, 'a' => '1', 'b' => '2')

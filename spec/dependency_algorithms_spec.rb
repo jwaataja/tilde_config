@@ -1,7 +1,5 @@
-require 'tildeconfig'
-
 module TildeConfig
-  describe DependencyAlgorithms do
+  RSpec.describe DependencyAlgorithms do
     it 'should find a basic cycle' do
       g = { a: %i[b], b: %i[a] }
       valid = [%i[a b], %i[b a]]

@@ -72,6 +72,9 @@ end
 # modules. When called it will yield to the provided block passing the module
 # itself and the rest of the arguments.
 def def_cmd(name)
-  # the given block should take in (module, *other_args)
+  if TildeConfig::TildeMod.method_defined?(name)
+    TildeConfig::TildeMod.remove_method(name)
+  end
+  # The given block should take in (module, *other_args).
   TildeConfig::TildeMod.define_method(name, ->(*args) { yield(self, *args) })
 end

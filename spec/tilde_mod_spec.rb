@@ -2,7 +2,7 @@ require 'tmpdir'
 require 'fileutils'
 
 module TildeConfig
-  describe TildeMod do
+  RSpec.describe TildeMod do
     # TODO: Change tests to use the subject.
     subject!(:m) { TildeMod.new(:test_name) }
 
@@ -77,7 +77,7 @@ module TildeConfig
     end
 
     describe 'Installing files' do
-      it 'one-arg syntax works' do
+      it 'can use one arg syntax' do
         m = TildeMod.new(:test_name)
 
         Dir.mktmpdir do |dir|
@@ -91,12 +91,12 @@ module TildeConfig
           m.root_dir src_dir
           m.install_dir dst_dir
           m.file 'filea'
-          m.execute_install(Options.new)
+          TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
         end
       end
 
-      it 'two-arg syntax works' do
+      it 'can use two arg syntax' do
         m = TildeMod.new(:test_name)
 
         Dir.mktmpdir do |dir|
@@ -110,7 +110,7 @@ module TildeConfig
           m.root_dir src_dir
           m.install_dir dst_dir
           m.file 'filea', 'fileb'
-          m.execute_install(Options.new)
+          TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
         end
       end
@@ -125,7 +125,7 @@ module TildeConfig
           dest_path = File.join(dir, 'output')
           m.root_dir src_dir
           m.file 'input', dest_path
-          m.execute_install(Options.new)
+          TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
         end
       end
@@ -147,7 +147,7 @@ module TildeConfig
           dest_file2 = File.join(dest_subdir, 'file2')
           dest_file3 = File.join(dest_dir, 'file3')
           File.write(dest_file3, 'contents3')
-          CLI.run(%w[install m], load_config_file: false) do
+          TildeConfigSpec.run(%w[install m]) do
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
@@ -177,7 +177,7 @@ module TildeConfig
           dest_file2 = File.join(dest_subdir, 'file2')
           dest_file3 = File.join(dest_dir, 'file3')
           File.write(dest_file3, 'contents3')
-          CLI.run(%w[install m], load_config_file: false) do
+          TildeConfigSpec.run(%w[install m]) do
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
@@ -194,7 +194,7 @@ module TildeConfig
     describe 'all_dependencies' do
       it 'resolves basic dependencies' do
         b_installed = false
-        CLI.run(%w[install a], load_config_file: false) do
+        TildeConfigSpec.run(%w[install a]) do
           mod :a => [:b]
           mod :b do |m|
             m.install do
@@ -207,7 +207,7 @@ module TildeConfig
 
       it "doesn't run if --skip-dependencies used" do
         installed = false
-        CLI.run(%w[install a --skip-dependencies], load_config_file: false) do
+        TildeConfigSpec.run(%w[install a --skip-dependencies]) do
           mod :a => [:b]
           mod :b do |m|
             m.install do
