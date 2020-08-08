@@ -236,7 +236,7 @@ module TildeConfig
           File.write(src_path, 'src contents')
           File.write(dest_path, 'dest contents')
           TildeConfigSpec.run(%w[install mod1 --no-override],
-                              suppress_output: false) do
+                              should_succeed: false) do
             mod :mod1 do |m|
               m.root_dir dir
               m.install_dir dir
@@ -256,7 +256,8 @@ module TildeConfig
           FileUtils.mkdir(src_dir)
           FileUtils.mkdir(dest_dir)
           File.write(File.join(src_dir, 'file'), 'contents')
-          TildeConfigSpec.run(%w[install mod1 --no-override]) do
+          TildeConfigSpec.run(%w[install mod1 --no-override],
+                              should_succeed: false) do
             mod :mod1 do |m|
               m.root_dir dir
               m.install_dir dir

@@ -23,14 +23,20 @@ module TildeConfigSpec
     #
     # If +suppress_output+ is true, then suppress all output produced by running
     # TildeConfig.
-    def run(args = [], suppress_output: true, &block)
-      if suppress_output
-        suppress_output do
-          TildeConfig::CLI.run(args, load_config_file: false, &block)
-        end
-      else
-        TildeConfig::CLI.run(args, load_config_file: false, &block)
-      end
+    #
+    # If the result of runing the command differs from +should_succeed+, raises
+    # an error.
+    def run(args = [], suppress_output: true, should_succeed: true, &block)
+      result = if suppress_output
+                 suppress_output do
+                   TildeConfig::CLI.run(args, load_config_file: false, &block)
+                 end
+               else
+                 TildeConfig::CLI.run(args, load_config_file: false, &block)
+               end
+      return if result == should_succeed
+
+      raise StandardError, 'Exit status differed from expected result'
     end
   end
 end

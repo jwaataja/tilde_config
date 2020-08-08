@@ -1,7 +1,10 @@
 module TildeConfig
   RSpec.describe 'The install command line function' do
     it 'should return true by default' do
-      expect(TildeConfigSpec.run(%w[install])).to be_truthy
+      expect(TildeConfigSpec.suppress_output do
+        CLI.run(%w[install], load_config_file: false)
+      end)
+        .to be_truthy
     end
 
     it 'should run install actions' do
@@ -60,7 +63,7 @@ module TildeConfig
     end
 
     it 'should detect unknown modules' do
-      result = TildeConfigSpec.run(%w[install fake_mod])
+      result = TildeConfigSpec.run(%w[install fake_mod], should_succeed: false)
       expect(result).to be_falsey
     end
 
@@ -114,7 +117,7 @@ module TildeConfig
 
     it 'should stop when an action fails by default' do
       flag = false
-      TildeConfigSpec.run(%w[install mod1]) do
+      TildeConfigSpec.run(%w[install mod1], should_succeed: false) do
         mod :mod1 do |m|
           m.install do
             raise ActionError, ''

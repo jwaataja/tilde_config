@@ -41,7 +41,7 @@ module TildeConfig
     it 'should not execute a second command if the first fails' do
       Dir.mktmpdir do |dir|
         path = File.join(dir, 'shell_test_file')
-        TildeConfigSpec.run(%w[install mod1]) do
+        TildeConfigSpec.run(%w[install mod1], should_succeed: false) do
           mod :mod1 do |m|
             m.install do
               sh 'false'
