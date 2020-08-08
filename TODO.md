@@ -1,5 +1,4 @@
 # General
-- Ensure the return value of `CLI.run` is always checked in tests.
 - Switch options to use options like `--[no-]-override` rather than just
   `--no-override`.
 
