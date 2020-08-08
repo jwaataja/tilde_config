@@ -1,6 +1,4 @@
 # General
-- Switch options to use options like `--[no-]-override` rather than just
-  `--no-override`.
 
 # Documentation
 - Document the command line options.

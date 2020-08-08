@@ -48,7 +48,7 @@ module TildeConfig
                 'Attempt to install system package dependencies') do
         self.packages = true
       end
-      parser.on('--skip-dependencies',
+      parser.on('--[no-]skip-dependencies',
                 "Don't install a module's dependencies") do
         self.skip_dependencies = true
       end
@@ -57,7 +57,7 @@ module TildeConfig
         self.config_file = c
       end
       parser.on('-i',
-                '--ignore-errors',
+                '--[no-]ignore-errors',
                 'Don\'t stop execution if writing to a file or a '\
                 'shell command fails') do |c|
         self.should_ignore_errors = c
