@@ -89,7 +89,11 @@ module TildeConfig
           end
         end
         puts "Copying #{src_path} to #{dest_path}"
-        FileUtils.cp(src_path, dest_path)
+        if file_tuple.is_symlink
+          FileUtils.ln_sf(src_path, dest_path)
+        else
+          FileUtils.cp(src_path, dest_path)
+        end
       end
 
       # Installs the directory at +src_path+ to +dest_path+. Raises a
@@ -118,7 +122,11 @@ module TildeConfig
         end
 
         if merge_strategy == :override || !File.exist?(dest_path)
-          FileUtils.cp_r(src_path, dest_path)
+          if file_tuple.is_symlink
+            FileUtils.ln_s(src_path, dest_path)
+          else
+            FileUtils.cp_r(src_path, dest_path)
+          end
         else
           merge_directories(file_tuple, src_path, dest_path, merge_strategy,
                             should_override)
