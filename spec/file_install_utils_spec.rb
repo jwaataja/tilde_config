@@ -27,6 +27,25 @@ module TildeConfig
       end
     end
 
+    it 'modifying symlinked file changes both instances' do
+      Dir.mktmpdir do |dir|
+        src_path = File.join(dir, 'input')
+        dest_path = File.join(dir, 'output')
+        TildeConfigSpec.suppress_output do
+          FileInstallUtils.install(
+            TildeFile.new(src_path, dest_path, is_symlink: true),
+            src_path,
+            dest_path
+          )
+        end
+
+        File.write(src_path, 'written to source')
+        expect(File.compare_file(src_path, dest_path)).to be_truthy
+        File.write(dest_path, 'written to dest')
+        expect(File.compare_file(src_path, dest_path)).to be_truthy
+      end
+    end
+
     it 'raises an error when src does not exist' do
       Dir.mktmpdir do |dir|
         src_path = File.join(dir, 'input')
