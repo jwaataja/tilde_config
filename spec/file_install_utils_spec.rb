@@ -41,9 +41,9 @@ module TildeConfig
         end
 
         File.write(src_path, 'written to source')
-        expect(File.compare_file(src_path, dest_path)).to be_truthy
+        expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
         File.write(dest_path, 'written to dest')
-        expect(File.compare_file(src_path, dest_path)).to be_truthy
+        expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
       end
     end
 
