@@ -31,6 +31,7 @@ module TildeConfig
       Dir.mktmpdir do |dir|
         src_path = File.join(dir, 'input')
         dest_path = File.join(dir, 'output')
+        FileUtils.touch(src_path)
         TildeConfigSpec.suppress_output do
           FileInstallUtils.install(
             TildeFile.new(src_path, dest_path, is_symlink: true),
