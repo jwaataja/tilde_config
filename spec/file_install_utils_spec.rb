@@ -8,7 +8,8 @@ module TildeConfig
         dest_path = File.join(dir, 'output')
         File.write(src_path, 'test contents')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(nil, src_path, dest_path)
+          FileInstallUtils.install(Tildefile.new(src_path, dest_path), src_path,
+                                   dest_path)
         end
         expect(File.exist?(dest_path)).to be_truthy
         expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
@@ -19,8 +20,10 @@ module TildeConfig
       Dir.mktmpdir do |dir|
         src_path = File.join(dir, 'input')
         dest_path = File.join(dir, 'output')
-        expect { FileInstallUtils.install(nil, src_path, dest_path) }
-          .to raise_error(FileInstallError)
+        expect do
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path)
+        end.to raise_error(FileInstallError)
       end
     end
 
@@ -31,7 +34,8 @@ module TildeConfig
         FileUtils.mkdir(File.join(dir, 'src_dir'))
         File.write(src_path, 'test contents')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(nil, src_path, dest_path)
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path)
         end
         expect(File.exist?(dest_path)).to be_truthy
         expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
