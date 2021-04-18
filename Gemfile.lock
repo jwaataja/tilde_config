@@ -79,6 +79,7 @@ DEPENDENCIES
   rubocop
   solargraph
   tildeconfig!
+  yard
 
 BUNDLED WITH
    2.1.4

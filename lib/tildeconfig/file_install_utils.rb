@@ -1,9 +1,7 @@
 module TildeConfig
-  ##
   # Methods for installing files and directories.
   module FileInstallUtils
     class << self
-      ##
       # Installs the file or directory at +src_path+ to +dest_path+. Raises a
       # +FileInstallError+ if the file at +src_path+ does not exist or if
       # there's an error while installing.
@@ -12,6 +10,13 @@ module TildeConfig
       # +:merge+. The +:override+ value installs directories by writing over the
       # destination. The +:merge+ option recursively merges directories so that
       # the file structure of the src is spliced into the destination directory.
+      # @param file_tuple [TildeFile] file to install
+      # @param src_path [String] path to source of file to install from
+      # @param dest_path [String] path to install file to
+      # @param merge_strategy [Symbol] merge strategy to use, either +:merge+
+      #   or +:override:+
+      # @param should_override [Boolean] if true and a file already exists at
+      #   +dest_path+, raises a +FileInstallError+
       def install(file_tuple, src_path, dest_path,
                   merge_strategy: :merge,
                   should_override: true)
@@ -29,9 +34,10 @@ module TildeConfig
 
       private
 
-      ##
       # Verifies that a file at +src_path+ exists. Raises a +FileInstallError+
       # if it does not.
+      # @param file_tuple [TildeFile] the +TildeFile+ to check
+      # @param src_path [String] the actual path to check if it exists at
       def check_src_file_exists(file_tuple, src_path)
         return if File.exist?(src_path)
 
@@ -41,10 +47,11 @@ module TildeConfig
         )
       end
 
-      ##
       # Ensures that the directory for +dest_path+ exists. If the destination
       # directory already exists and is a file, raises a +FileInstallError+. If
       # it doesn't exist, attempt to create it.
+      # @param file_tuple [TildeFile] the +TildeFile+ to check
+      # @param dest_path [String] the actual path to check if it exists at
       def ensure_install_directory_exists(file_tuple, dest_path)
         directory = File.dirname(dest_path)
         if File.exist?(directory) && !File.directory?(directory)
@@ -56,9 +63,13 @@ module TildeConfig
         FileUtils.mkdir_p(directory)
       end
 
-      ##
       # Installs the regular file at +src_path+ to +dest_path+. Raises a
       # +FileInstallError+ if destination exists and is not a regular file.
+      # @param file_tuple [TildeFile] the file to install
+      # @param src_path [String] path to source of file to install from
+      # @param dest_path [String] path to install file to
+      # @param should_override [Boolean] if true and a file already exists at
+      #   +dest_path+, raises a +FileInstallError+
       def install_file(file_tuple, src_path, dest_path, should_override)
         if File.exist?(dest_path)
           unless File.file?(dest_path)
@@ -81,9 +92,15 @@ module TildeConfig
         FileUtils.cp(src_path, dest_path)
       end
 
-      ##
       # Installs the directory at +src_path+ to +dest_path+. Raises a
       # +FileInstallError+ if the destination exists and is not a directory.
+      # @param file_tuple [TildeFile] the file to install
+      # @param src_path [String] path to source of file to install from
+      # @param dest_path [String] path to install file to
+      # @param merge_strategy [Symbol] merge strategy to use, either +:merge+
+      #   or +:override:+
+      # @param should_override [Boolean] if true and a file already exists at
+      #   +dest_path+, raises a +FileInstallError+
       def install_directory(file_tuple, src_path, dest_path, merge_strategy,
                             should_override)
         check_merge_strategy(merge_strategy)
@@ -108,9 +125,11 @@ module TildeConfig
         end
       end
 
-      ##
       # Verifies that +dest_path+ is a directory. If not, raises a
       # +FileInstallError+.
+      # @param file_tuple [TildeFile] the +TildeFile+ to check
+      # @param src_path [String] the source directory
+      # @param dest_path [String] the actual path to check if it exists at
       def check_dest_is_directory(file_tuple, src_path, dest_path)
         return if File.directory?(dest_path)
 
@@ -121,9 +140,15 @@ module TildeConfig
         )
       end
 
-      ##
       # Installs all entries in the directory at +src_path+ to the directory at
       # +dest_path+. Raises a +FileInstallError+ if any entry fails to install.
+      # @param file_tuple [TildeFile] file to install
+      # @param src_path [String] path to source of file to install from
+      # @param dest_path [String] path to install file to
+      # @param merge_strategy [Symbol] merge strategy to use, either +:merge+
+      #   or +:override:+
+      # @param should_override [Boolean] if true and a file already exists at
+      #   +dest_path+, raises a +FileInstallError+
       def merge_directories(file_tuple, src_path, dest_path, merge_strategy,
                             should_override)
         check_merge_strategy(merge_strategy)
@@ -138,9 +163,9 @@ module TildeConfig
         end
       end
 
-      ##
       # Verifies that +merge_strategy+ is either +:override+ or +:merge+. Raises
       # an error if not.
+      # @param merge_strategy [Symbol] symbol to check
       def check_merge_strategy(merge_strategy)
         return unless merge_strategy != :override && merge_strategy != :merge
 
