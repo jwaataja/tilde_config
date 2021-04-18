@@ -212,6 +212,15 @@ module TildeConfig
 
     private
 
+    ##
+    # Helper function to abstract the functionality of multiple file* methods.
+    #
+    # The +src+ and +dest+ are as in the +file+ method and +is_symlink+ controls
+    # whether the file should be installed as a symlink.
+    def file_helper(src, dest, is_symlink: false)
+      @files << TildeFile.new(src, dest, is_symlink: is_symlink)
+    end
+
     # Takes an enumerable collection of callable objects in +commands+ and
     # executes them in order. Expects that each command performs one action to
     # install, update, or remove a module.
