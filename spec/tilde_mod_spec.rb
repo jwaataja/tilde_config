@@ -29,7 +29,22 @@ module TildeConfig
       expect(m.files.size).to eq(2)
     end
 
+    it 'allows both types of file_sym invocations' do
+      m = TildeMod.new(:test_name)
+      m.file_sym 'source'
+      m.file_sym 'source2', 'destination2'
+      expect(m.files.size).to eq(2)
+    end
+
     it 'can use file_glob with patterns' do
+      test_file_glob_pattern(false)
+    end
+
+    it 'can use file_glob_sym with patterns' do
+      test_file_glob_pattern(true)
+    end
+
+    def test_file_glob_pattern(use_symlinks)
       m = TildeMod.new(:test_name)
       Dir.mktmpdir do |dir|
         path1 = File.join(dir, 'file1')
@@ -37,7 +52,11 @@ module TildeConfig
         FileUtils.touch([path1, path2])
         m.root_dir dir
         m.install_dir File.join(dir, 'dest_dir')
-        m.file_glob 'file*'
+        if use_symlinks
+          m.file_glob_sym 'file*'
+        else
+          m.file_glob 'file*'
+        end
         expect(m.files.size).to eq(2)
         m.files.each do |f|
           expect(f.src).to match(/\Afile[12]\Z/)
@@ -47,6 +66,14 @@ module TildeConfig
     end
 
     it 'expands glob patterns from the src_dir' do
+      test_expand_glob_from_src_dir(false)
+    end
+
+    it 'expands glob patterns from the src_dir when using symlinks' do
+      test_expand_glob_from_src_dir(true)
+    end
+
+    def test_expand_glob_from_src_dir(use_symlinks)
       Dir.mktmpdir do |dir|
         src_dir = File.join(dir, 'src_dir')
         FileUtils.mkdir(src_dir)
@@ -54,7 +81,11 @@ module TildeConfig
         path2 = File.join(src_dir, 'file2')
         FileUtils.touch([path1, path2])
         m.root_dir dir
-        m.file_glob 'src_dir/file*'
+        if use_symlinks
+          m.file_glob_sym 'src_dir/file*'
+        else
+          m.file_glob 'src_dir/file*'
+        end
         expect(m.files.size).to eq(2)
         m.files.each do |f|
           expect(f.src).to match(%r{\Asrc_dir/file[12]\Z})
@@ -64,6 +95,14 @@ module TildeConfig
     end
 
     it 'installs glob files to the correct directory' do
+      test_install_glob_to_correct_directory(false)
+    end
+
+    it 'installs glob files to the correct directory when using symlinks' do
+      test_install_glob_to_correct_directory(true)
+    end
+
+    def test_install_glob_to_correct_directory(use_symlinks)
       Dir.mktmpdir do |dir|
         src_dir = File.join(dir, 'src_dir')
         FileUtils.mkdir(src_dir)
@@ -71,7 +110,11 @@ module TildeConfig
         path2 = File.join(src_dir, 'file2')
         FileUtils.touch([path1, path2])
         m.root_dir dir
-        m.file_glob 'src_dir/file*', 'dest_dir'
+        if use_symlinks
+          m.file_glob_sym 'src_dir/file*', 'dest_dir'
+        else
+          m.file_glob 'src_dir/file*', 'dest_dir'
+        end
         expect(m.files.size).to eq(2)
         m.files.each do |f|
           expect(f.dest).to match(%r{\Adest_dir/file[12]\Z})
@@ -80,6 +123,7 @@ module TildeConfig
     end
 
     it 'can use file_glob with a pattern that returns no results' do
+      # TODO: Should this case be an error?
       m = TildeMod.new(:test_name)
       Dir.mktmpdir do |dir|
         m.file_glob "#{dir}/*"
@@ -117,6 +161,14 @@ module TildeConfig
 
     describe 'Installing files' do
       it 'can use one arg syntax' do
+        test_install_one_arg(false)
+      end
+
+      it 'can use one arg syntarx with symlinks' do
+        test_install_one_arg(true)
+      end
+
+      def test_install_one_arg(use_symlinks)
         m = TildeMod.new(:test_name)
 
         Dir.mktmpdir do |dir|
@@ -129,13 +181,25 @@ module TildeConfig
           File.write(src_file, 'some contents')
           m.root_dir src_dir
           m.install_dir dst_dir
-          m.file 'filea'
+          if use_symlinks
+            m.file_sym 'filea'
+          else
+            m.file 'filea'
+          end
           TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
         end
       end
 
       it 'can use two arg syntax' do
+        test_install_two_arg(false)
+      end
+
+      it 'can use two arg syntax with symlinks' do
+        test_install_two_arg(true)
+      end
+
+      def test_install_two_arg(use_symlinks)
         m = TildeMod.new(:test_name)
 
         Dir.mktmpdir do |dir|
@@ -148,13 +212,25 @@ module TildeConfig
           File.write(src_file, 'some other contents')
           m.root_dir src_dir
           m.install_dir dst_dir
-          m.file 'filea', 'fileb'
+          if use_symlinks
+            m.file_sym 'filea', 'fileb'
+          else
+            m.file 'filea', 'fileb'
+          end
           TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
         end
       end
 
       it 'can install to absolute paths' do
+        test_install_absolute_paths(false)
+      end
+
+      it 'can install to absolute paths with symlinks' do
+        test_install_absolute_paths(true)
+      end
+
+      def test_install_absolute_paths(use_symlinks)
         m = TildeMod.new(:test)
         Dir.mktmpdir do |dir|
           src_dir = File.join(dir, 'src')
@@ -163,7 +239,11 @@ module TildeConfig
           File.write(src_path, 'contents')
           dest_path = File.join(dir, 'output')
           m.root_dir src_dir
-          m.file 'input', dest_path
+          if use_symlinks
+            m.file_sym 'input', dest_path
+          else
+            m.file 'input', dest_path
+          end
           TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
           expect(FileUtils.compare_file(src_path, dest_path)).to be_truthy
         end
