@@ -50,7 +50,8 @@ module TildeConfig
         dest_file1 = File.join(dest_dir, 'file1')
         dest_file2 = File.join(dest_dir, 'file2')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(nil, src_dir, dest_dir)
+          FileInstallUtils.install(TildeFile.new(src_dir, dest_dir), src_dir,
+                                   dest_dir)
         end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
@@ -75,8 +76,8 @@ module TildeConfig
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(nil, src_dir, dest_dir,
-                                   merge_strategy: :merge)
+          FileInstallUtils.install(TildeFile.new(src_dir, dest_dir), src_dir,
+                                   dest_dir, merge_strategy: :merge)
         end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
@@ -102,8 +103,8 @@ module TildeConfig
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(nil, src_dir, dest_dir,
-                                   merge_strategy: :override)
+          FileInstallUtils.install(TildeFile.new(src_dir, dest_dir), src_dir,
+                                   dest_dir, merge_strategy: :override)
         end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
@@ -118,8 +119,10 @@ module TildeConfig
         src_path = File.join(dir, 'input')
         File.write(src_path, 'contents')
         dest_path = File.join(dest_dir, 'output')
-        expect { FileInstallUtils.install(nil, src_path, dest_path) }
-          .to raise_error(FileInstallError)
+        expect do
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path)
+        end.to raise_error(FileInstallError)
       end
     end
 
@@ -129,8 +132,10 @@ module TildeConfig
         dest_path = File.join(dir, 'output')
         File.write(src_path, 'contents')
         FileUtils.mkdir(dest_path)
-        expect { FileInstallUtils.install(nil, src_path, dest_path) }
-          .to raise_error(FileInstallError)
+        expect do
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path)
+        end.to raise_error(FileInstallError)
       end
     end
 
@@ -141,8 +146,10 @@ module TildeConfig
         dest_path = File.join(dir, 'destdir')
         FileUtils.mkdir(src_path)
         File.write(dest_path, 'regular file')
-        expect { FileInstallUtils.install(nil, src_path, dest_path) }
-          .to raise_error(FileInstallError)
+        expect do
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path)
+        end.to raise_error(FileInstallError)
       end
     end
 
@@ -153,8 +160,8 @@ module TildeConfig
         File.write(src_path, 'test contents')
         File.write(dest_path, 'test contents')
         expect do
-          FileInstallUtils.install(nil, src_path, dest_path,
-                                   should_override: false)
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path, should_override: false)
         end.to raise_error(FileInstallError)
       end
     end
@@ -166,8 +173,8 @@ module TildeConfig
         FileUtils.mkdir(src_path)
         FileUtils.mkdir(dest_path)
         expect do
-          FileInstallUtils.install(nil, src_path, dest_path,
-                                   should_override: false)
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
+                                   dest_path, should_override: false)
         end.to raise_error(FileInstallError)
       end
     end
@@ -183,7 +190,8 @@ module TildeConfig
         File.write(src_path, 'test contents')
         File.write(dest_path, 'test contents')
         expect do
-          FileInstallUtils.install(nil, src_dir, dest_dir,
+          FileInstallUtils.install(TildeFile.new(src_dir, dest_dir), src_dir,
+                                   dest_dir,
                                    merge_strategy: :merge,
                                    should_override: false)
         end.to raise_error(FileInstallError)
