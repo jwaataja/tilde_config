@@ -197,8 +197,18 @@ module TildeConfig
     # @param dest [String] either an absolute path or an absolute path relative
     #   to the installation directory for this module
     def file(src, dest = nil)
-      dest = src if dest.nil?
-      @files << TildeFile.new(src, dest)
+      # TODO: Check if src is a relative path here, and in other
+      # commands
+      file_helper(src, dest, false)
+    end
+
+    # Like the +file+ command, but creates a symlink instead.
+    # @param src [String] relative path to the file to install in the root
+    #   directory for this repository
+    # @param dest [String] either an absolute path or an absolute path relative
+    #   to the installation directory for this module
+    def file_sym(src, dest = nil)
+      file_helper(src, dest, true)
     end
 
     # Takes a shell glob pattern string +src_pattern+ and an optional
@@ -216,14 +226,17 @@ module TildeConfig
     # @param dest_dir [String, nil] if not nil, the directory to install the
     #   files to
     def file_glob(src_pattern, dest_dir = nil)
-      Dir.glob(src_pattern, base: @root_dir) do |src|
-        dest_path = if dest_dir.nil?
-                      src
-                    else
-                      File.join(dest_dir, File.basename(src))
-                    end
-        file(src, dest_path)
-      end
+      file_glob_helper(src_pattern, dest_dir, false)
+    end
+
+    # Like the +file_glob+ command, but installs all files as symlinks
+    # instead.
+    # @param src_pattern [String] a file glob pattern representing files to
+    #   install
+    # @param dest_dir [String, nil] if not nil, the directory to install the
+    #   files to
+    def file_glob_sym(src_pattern, dest_dir = nil)
+      file_glob_helper(src_pattern, dest_dir, true)
     end
 
     # Same as file, but expects a directory as the source.
@@ -236,13 +249,39 @@ module TildeConfig
 
     private
 
-    ##
-    # Helper function to abstract the functionality of multiple file* methods.
-    #
-    # The +src+ and +dest+ are as in the +file+ method and +is_symlink+ controls
-    # whether the file should be installed as a symlink.
-    def file_helper(src, dest, is_symlink: false)
+    # Shared behavior of the +file+ and +file_sym+ commands that differs
+    # in whether it uses symlinks.
+    # @param src [String] relative path to the file to install in the root
+    #   directory for this repository
+    # @param dest [String, nil] either an absolute path or an absolute
+    #   path relative to the installation directory for this module
+    # @param is_symlink [Boolean] if true, installs the file as a
+    #   symlink
+    def file_helper(src, dest, is_symlink)
+      dest = src if dest.nil?
       @files << TildeFile.new(src, dest, is_symlink: is_symlink)
+    end
+
+    # Shared behavior of +file_glob+ and +file_glob_sym+ that differs in
+    # whether it uses symlinks.
+    # @param src_pattern [String] a file glob pattern representing files to
+    #   install
+    # @param dest_dir [String, nil] if not nil, the directory to install the
+    #   files to
+    # @param use_symlinks [Boolean] if true, installs files with symlinks
+    def file_glob_helper(src_pattern, dest_dir, use_symlinks)
+      Dir.glob(src_pattern, base: @root_dir) do |src|
+        dest_path = if dest_dir.nil?
+                      src
+                    else
+                      File.join(dest_dir, File.basename(src))
+                    end
+        if use_symlinks
+          file_sym(src, dest_path)
+        else
+          file(src, dest_path)
+        end
+      end
     end
 
     # Takes an enumerable collection of callable objects in +commands+ and
