@@ -1,5 +1,5 @@
 module TildeMod
-  describe TildeMod do
+  RSpec.describe TildeMod do
     describe 'Installing files' do
       it 'can use one arg syntax' do
         test_install_one_arg(false)
