@@ -8,7 +8,7 @@ module TildeConfig
         dest_path = File.join(dir, 'output')
         File.write(src_path, 'test contents')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(Tildefile.new(src_path, dest_path), src_path,
+          FileInstallUtils.install(TildeFile.new(src_path, dest_path), src_path,
                                    dest_path)
         end
         expect(File.exist?(dest_path)).to be_truthy
