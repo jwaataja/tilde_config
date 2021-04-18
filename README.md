@@ -365,3 +365,7 @@ then run tests using
 ```
 bundle exec rspec spec
 ```
+
+## Generating Documentation
+
+To generate documentation using YARD, run `bundle exec yard doc`.
