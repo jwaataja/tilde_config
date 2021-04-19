@@ -63,6 +63,28 @@ module TildeConfig
         end
       end
 
+      it 'modifying symlinked files modifies both' do
+        m = TildeMod.new(:test_name)
+
+        Dir.mktmpdir do |dir|
+          src_dir = File.join(dir, 'source')
+          dst_dir = File.join(dir, 'dest')
+          src_file = File.join(src_dir, 'filea')
+          dst_file = File.join(dst_dir, 'filea')
+          Dir.mkdir(src_dir)
+          Dir.mkdir(dst_dir)
+          FileUtils.touch(src_file)
+          m.root_dir src_dir
+          m.install_dir dst_dir
+          m.file_sym 'filea'
+          TildeConfigSpec.suppress_output { m.execute_install(Options.new) }
+          File.write(src_file, 'written to source')
+          expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
+          File.write(dst_file, 'written to dest')
+          expect(FileUtils.compare_file(src_file, dst_file)).to be_truthy
+        end
+      end
+
       it 'can install to absolute paths' do
         test_install_absolute_paths(false)
       end
