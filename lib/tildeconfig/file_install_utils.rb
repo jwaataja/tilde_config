@@ -24,6 +24,10 @@ module TildeConfig
         ensure_install_directory_exists(file_tuple, dest_path)
         check_src_file_exists(file_tuple, src_path)
 
+        # When using symlinks, we don't ever want the source file to be
+        # a relative path.
+        src_path = File.expand_path(src_path) if file_tuple.is_symlink
+
         if File.file?(src_path)
           install_file(file_tuple, src_path, dest_path, should_override)
         elsif File.directory?(src_path)
