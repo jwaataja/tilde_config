@@ -113,6 +113,14 @@ module TildeConfig
       end
 
       it 'can install a directory and merge by default' do
+        test_install_directory_merge(false)
+      end
+
+      it 'can install a directory and merge by default with symlinks' do
+        test_install_directory_merge(true)
+      end
+
+      def test_install_directory_merge(use_symlinks)
         Dir.mktmpdir do |dir|
           src_dir = File.join(dir, 'src_dir')
           src_subdir = File.join(src_dir, 'subdir')
@@ -133,7 +141,11 @@ module TildeConfig
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
-              m.directory 'src_dir', 'dest_dir'
+              if use_symlinks
+                m.directory_sym 'src_dir', 'dest_dir'
+              else
+                m.directory 'src_dir', 'dest_dir'
+              end
             end
           end
           expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
@@ -143,6 +155,14 @@ module TildeConfig
       end
 
       it 'can install a directory and use override option' do
+        test_install_directory_override(false)
+      end
+
+      it 'can install a directory and use override option with symlinks' do
+        test_install_directory_override(true)
+      end
+
+      def test_install_directory_override(use_symlinks)
         Dir.mktmpdir do |dir|
           src_dir = File.join(dir, 'src_dir')
           src_subdir = File.join(src_dir, 'subdir')
@@ -163,7 +183,11 @@ module TildeConfig
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
-              m.directory 'src_dir', 'dest_dir'
+              if use_symlinks
+                m.directory_sym 'src_dir', 'dest_dir'
+              else
+                m.directory 'src_dir', 'dest_dir'
+              end
             end
           end
           expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy

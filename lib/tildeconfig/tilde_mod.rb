@@ -247,6 +247,14 @@ module TildeConfig
       file(src, dest)
     end
 
+    # Same as file_sym, but expects a directory as the source.
+    # @param src [String] path to a directory to install
+    # @param dest [String, nil] path to the location the directory should be
+    #   installed as
+    def directory_sym(src, dest = nil)
+      file_sym(src, dest)
+    end
+
     private
 
     # Shared behavior of the +file+ and +file_sym+ commands that differs
