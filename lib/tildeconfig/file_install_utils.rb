@@ -125,8 +125,8 @@ module TildeConfig
           if merge_strategy == :override
             FileUtils.rm_rf(dest_path)
           elsif file_tuple.is_symlink
-            warn 'Installing directory as symlink, but destination directory ' \
-                 'exists. Removing it.'
+            warn "Installing directory #{src_path} as symlink to " \
+                 "#{dest_path}, but destination directory exists. Removing it."
             FileUtils.rm_rf(dest_path)
           end
         end
