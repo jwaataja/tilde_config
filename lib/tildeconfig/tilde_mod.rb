@@ -251,7 +251,7 @@ module TildeConfig
       file(src, dest)
     end
 
-    # Same as file_sym, but expects a directory as the source.
+    # Same as the +directory+ command, but installs the directory as a symlink.
     # @param src [String] path to a directory to install
     # @param dest [String, nil] path to the location the directory should be
     #   installed as
