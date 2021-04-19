@@ -1,4 +1,6 @@
 # General
+- When updating or uninstalling modules, do dependencies have to be taken into
+    account? Currently, they are not.
 
 # Documentation
 - Document the command line options.
