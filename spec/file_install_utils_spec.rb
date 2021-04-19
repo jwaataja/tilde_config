@@ -117,14 +117,6 @@ module TildeConfig
     end
 
     it 'can recursively merge a directory' do
-      test_recursively_merge_directory(false)
-    end
-
-    it 'can recursively merge a directory when using symlinks' do
-      test_recursively_merge_directory(true)
-    end
-
-    def test_recursively_merge_directory(use_symlinks)
       Dir.mktmpdir do |dir|
         src_dir = File.join(dir, 'src_dir')
         src_subdir = File.join(src_dir, 'subdir')
@@ -142,12 +134,8 @@ module TildeConfig
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(
-            TildeFile.new(src_dir, dest_dir, is_symlink: use_symlinks),
-            src_dir,
-            dest_dir,
-            merge_strategy: :merge
-          )
+          FileInstallUtils.install(TildeFile.new(src_dir, dest_dir), src_dir,
+                                   dest_dir, merge_strategy: :merge)
         end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
@@ -159,8 +147,7 @@ module TildeConfig
       test_overrides_directories(false)
     end
 
-    it 'overrides directories when override merge strategy specied when ' \
-       'using symlinks' do
+    it 'overrides directories when when using symlinks' do
       test_overrides_directories(true)
     end
 
@@ -182,12 +169,23 @@ module TildeConfig
         dest_file3 = File.join(dest_dir, 'file3')
         File.write(dest_file3, 'contents3')
         TildeConfigSpec.suppress_output do
-          FileInstallUtils.install(
-            TildeFile.new(src_dir, dest_dir, is_symlink: use_symlinks),
-            src_dir,
-            dest_dir,
-            merge_strategy: :override
-          )
+          if use_symlinks
+            # The default merge strategy is :merge, but this is ignored
+            # when installing a directory as a symlink, so when testing
+            # the symlink version we omit the merge_strategy option.
+            FileInstallUtils.install(
+              TildeFile.new(src_dir, dest_dir, is_symlink: true),
+              src_dir,
+              dest_dir
+            )
+          else
+            FileInstallUtils.install(
+              TildeFile.new(src_dir, dest_dir, is_symlink: false),
+              src_dir,
+              dest_dir,
+              merge_strategy: :override
+            )
+          end
         end
         expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
         expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy

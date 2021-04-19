@@ -113,14 +113,6 @@ module TildeConfig
       end
 
       it 'can install a directory and merge by default' do
-        test_install_directory_merge(false)
-      end
-
-      it 'can install a directory and merge by default with symlinks' do
-        test_install_directory_merge(true)
-      end
-
-      def test_install_directory_merge(use_symlinks)
         Dir.mktmpdir do |dir|
           src_dir = File.join(dir, 'src_dir')
           src_subdir = File.join(src_dir, 'subdir')
@@ -141,11 +133,7 @@ module TildeConfig
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
-              if use_symlinks
-                m.directory_sym 'src_dir', 'dest_dir'
-              else
-                m.directory 'src_dir', 'dest_dir'
-              end
+              m.directory 'src_dir', 'dest_dir'
             end
           end
           expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
@@ -179,7 +167,9 @@ module TildeConfig
           dest_file2 = File.join(dest_subdir, 'file2')
           dest_file3 = File.join(dest_dir, 'file3')
           File.write(dest_file3, 'contents3')
-          TildeConfigSpec.run(%w[install m]) do
+          TildeConfigSpec.run(
+            %w[install m --directory-merge-strategy override]
+          ) do
             mod :m do |m|
               m.root_dir dir
               m.install_dir dir
@@ -192,7 +182,7 @@ module TildeConfig
           end
           expect(FileUtils.compare_file(src_file1, dest_file1)).to be_truthy
           expect(FileUtils.compare_file(src_file2, dest_file2)).to be_truthy
-          expect(File.exist?(dest_file3)).to be_truthy
+          expect(File.exist?(dest_file3)).to be_falsey
         end
       end
 
