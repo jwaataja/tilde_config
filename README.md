@@ -101,6 +101,12 @@ mod :vim do |m|
 end
 ```
 
+The `file_sym` and `file_glob_sym` commands behave the same as `file` and
+`file_glob`, but install the files as symlinks. This makes it easier to
+synchronize between the stored configuration files and the versions installed on
+the system. If you install files as symlinks, changing either the stored or
+installed version of the file will update the other.
+
 ### Actions
 
 The `tildeconfig` command line program can do more than install modules. It can

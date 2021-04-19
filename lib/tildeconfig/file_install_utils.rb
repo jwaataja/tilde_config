@@ -24,6 +24,10 @@ module TildeConfig
         ensure_install_directory_exists(file_tuple, dest_path)
         check_src_file_exists(file_tuple, src_path)
 
+        # When using symlinks, we don't ever want the source file to be
+        # a relative path.
+        src_path = File.expand_path(src_path) if file_tuple.is_symlink
+
         if File.file?(src_path)
           install_file(file_tuple, src_path, dest_path, should_override)
         elsif File.directory?(src_path)
@@ -89,7 +93,11 @@ module TildeConfig
           end
         end
         puts "Copying #{src_path} to #{dest_path}"
-        FileUtils.cp(src_path, dest_path)
+        if file_tuple.is_symlink
+          FileUtils.ln_sf(src_path, dest_path)
+        else
+          FileUtils.cp(src_path, dest_path)
+        end
       end
 
       # Installs the directory at +src_path+ to +dest_path+. Raises a
@@ -114,11 +122,23 @@ module TildeConfig
             )
           end
 
-          FileUtils.rm_rf(dest_path) if merge_strategy == :override
+          if merge_strategy == :override
+            FileUtils.rm_rf(dest_path)
+          elsif file_tuple.is_symlink
+            warn "Installing directory #{src_path} as symlink to " \
+                 "#{dest_path}, but destination directory exists. Removing it."
+            FileUtils.rm_rf(dest_path)
+          end
         end
 
-        if merge_strategy == :override || !File.exist?(dest_path)
-          FileUtils.cp_r(src_path, dest_path)
+        # We never merge directories if the directory is a symlink.
+        if merge_strategy == :override || !File.exist?(dest_path) ||
+           file_tuple.is_symlink
+          if file_tuple.is_symlink
+            FileUtils.ln_s(src_path, dest_path)
+          else
+            FileUtils.cp_r(src_path, dest_path)
+          end
         else
           merge_directories(file_tuple, src_path, dest_path, merge_strategy,
                             should_override)
