@@ -158,6 +158,10 @@ module TildeConfig
           puts "Warning: #{src} is not a regular file"
           next
         end
+        if File.symlink?(src)
+          puts "Warning: #{src} is a symlink, skipping"
+          next
+        end
         unless File.exist?(dest)
           puts "Warning: #{dest} does not exist, skipping"
           next
