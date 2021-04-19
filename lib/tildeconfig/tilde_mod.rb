@@ -284,11 +284,7 @@ module TildeConfig
                     else
                       File.join(dest_dir, File.basename(src))
                     end
-        if use_symlinks
-          file_sym(src, dest_path)
-        else
-          file(src, dest_path)
-        end
+        file_helper(src, dest_path, use_symlinks)
       end
     end
 
