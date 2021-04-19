@@ -67,9 +67,9 @@ module TildeConfig
           when 'install'
             install(modules, options)
           when 'uninstall'
-            uninstall(options)
+            uninstall(modules, options)
           when 'update'
-            update(options)
+            update(modules, options)
           when 'refresh'
             refresh(modules, options)
           else
@@ -111,9 +111,11 @@ module TildeConfig
       end
 
       ##
-      # Uninstalls all modules. Returns true on success, false on failure.
-      def uninstall(options)
-        Configuration.instance.modules.each do |name, m|
+      # Uninstalls the given modules. Returns true on success, false on failure.
+      def uninstall(modules, options)
+        modules = Configuration.instance.modules.keys if modules.empty?
+        modules.each do |name|
+          m = Configuration.instance.modules[name]
           puts "Uninstalling #{name}"
           m.execute_uninstall(options)
         end
@@ -121,10 +123,12 @@ module TildeConfig
       end
 
       ##
-      # Updates all modules. Returns true on success, false on failure.
-      def update(options)
+      # Updates the given modules. Returns true on success, false on failure.
+      def update(modules, options)
+        modules = Configuration.instance.modules.keys if modules.empty?
         succeeded = true
-        Configuration.instance.modules.each do |name, m|
+        modules.each do |name|
+          m = Configuration.instance.modules[name]
           puts "Updating #{name}"
           begin
             succeeded = m.execute_update(options)
@@ -134,7 +138,7 @@ module TildeConfig
               "#{e.message}"
             succeeded = false
           end
-          ereturn false unless succeeded
+          return false unless succeeded
         end
         true
       end
