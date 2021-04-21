@@ -88,7 +88,7 @@ module TildeConfig
           option_string << option[prefix.size..]
           option_strings << option_string
         end
-        result << option_strings.join(',')
+        result << option_strings.join(', ')
         result << ': '
         [result, prefixes]
       end
