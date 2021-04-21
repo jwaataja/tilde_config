@@ -69,7 +69,8 @@ module TildeConfig
           case response
           when actions[:copy]
             puts "Copying #{dest} to #{src}"
-            FileUtils.cp(dest, src) if proceed
+            FileUtils.cp(dest, src)
+            return
           when actions[:view]
             view_file_diff(src, dest)
           when actions[:skip]
