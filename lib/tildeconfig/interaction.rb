@@ -73,8 +73,7 @@ module TildeConfig
       # @return [Array] the generated prompt and a map from prefixes to the
       #   option that would be selected by the prefix
       def options_prompt(prompt, options, default_response)
-        result = prompt
-        result << ' '
+        result = "#{prompt} "
         prefixes = {}
         option_strings = []
         options.each do |option|
