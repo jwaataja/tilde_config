@@ -49,7 +49,7 @@ module TildeConfig
         return if FileUtils.compare_file(src, dest)
 
         proceed = !should_prompt || Interaction.ask_yes_no(
-          "Update #{src} in repository from #{dest}? [y/N] "
+          "Update #{src} in repository from #{dest}?"
         )
         return unless proceed
 

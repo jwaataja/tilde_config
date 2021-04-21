@@ -342,7 +342,7 @@ module TildeConfig
     # @param file_tuple [TildeFile] the file to uninstall
     def run_file_uninstall(file_tuple)
       dest = File.join(@install_dir, file_tuple.dest)
-      FileUtils.rm(dest) if ask_yes_no("Delete #{dest}? [y/N] ")
+      FileUtils.rm(dest) if ask_yes_no("Delete #{dest}?")
       # remove empty directories
       # dir = dest
       # loop do
