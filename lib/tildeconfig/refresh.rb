@@ -25,6 +25,8 @@ module TildeConfig
           end
           if File.file?(src)
             refresh_file(src, dest, should_prompt)
+          elsif File.directory?(dest)
+            refresh_directory(src, dest, should_prompt)
           else
             puts "Warning: unknown filetype #{src}"
           end
@@ -80,6 +82,8 @@ module TildeConfig
         src_entries = Dir.entries(src).sort
         dest_entries = Dir.entries(dest).sort
         src_entries.each do |entry|
+          next if %w[. ..].include?(entry)
+
           src_path = File.join(src, entry)
           dest_path = File.join(dest, entry)
           next if File.symlink?(src_path)
