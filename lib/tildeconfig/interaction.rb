@@ -83,7 +83,6 @@ module TildeConfig
                              option == default_response
                             "[#{prefix.capitalize}]"
                           else
-
                             "[#{prefix}]"
                           end
           option_string << option[prefix.size..]
