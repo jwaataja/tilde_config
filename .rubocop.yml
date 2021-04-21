@@ -29,6 +29,7 @@ Style/AccessorGrouping:
     Enabled: false
 
 AllCops:
+    TargetRubyVersion: 2.7
     Exclude:
         - 'Gemfile'
         - 'tildeconfig.gemspec'
