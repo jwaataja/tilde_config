@@ -11,11 +11,14 @@ module TildeConfig
     # @return [Hash<String, SystemPackage> map from package names as strings to
     #   the +SystemPackage+ for it
     attr_reader :system_packages
+    # @return [Settings] the settings for the configuration
+    attr_reader :settings
 
     def initialize
       @modules = {}
       @installers = {}
       @system_packages = {}
+      @settings = Settings.new
     end
 
     class << self
@@ -31,8 +34,12 @@ module TildeConfig
 
     # Yields to the provided block with a temporary empty configuration. The
     # global configuration is reset to its origin original state afterward.
-    # Returns the result of the block.
-    def self.with_empty_configuration
+    # Returns the result of the block. Can also pass initial settings for the
+    # configuration.
+    # @param settings [Hash<Symbol, Object>] map from symbols representing
+    #   setting names to values for that setting that the configuration will
+    #   have
+    def self.with_empty_configuration(settings = {})
       old_configuration = instance
       self.instance = new
       begin
