@@ -53,9 +53,9 @@ module TildeConfig
         puts "Installed file #{dest} differed from local version #{src}"
         loop do
           actions = {
-            copy: 'Copy to local respository',
-            skip: 'Skip it',
-            diff: 'View differences'
+            copy: 'copy to local respository',
+            skip: 'skip it',
+            diff: 'view differences'
           }
           response = actions[:copy]
           if should_prompt
