@@ -67,5 +67,52 @@ module TildeConfig
         expect(File.read(src_file)).to eq(contents)
       end
     end
+
+    it 'can refresh a directory with a single file' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src')
+        dest_dir = File.join(dir, 'dest')
+        src_subdir = File.join(src_dir, 'dir')
+        dest_subdir = File.join(dest_dir, 'dir')
+        FileUtils.mkdir_p(src_subdir)
+        FileUtils.mkdir_p(dest_subdir)
+        src_file = File.join(src_subdir, 'testfile')
+        dest_file = File.join(dest_subdir, 'testfile')
+        File.write(src_file, 'contents from source')
+        File.write(dest_file, 'contents from dest')
+        m = TildeMod.new(:test_name)
+        m.root_dir src_dir
+        m.install_dir dest_dir
+        m.directory 'dir'
+        TildeConfigSpec.suppress_output do
+          Refresh.refresh(m, should_prompt: false)
+        end
+        expect(File.read(src_file)).to eq('contents from dest')
+        expect(FileUtils.compare_file(src_file, dest_file)).to be_truthy
+      end
+    end
+
+    it 'adds new files in a directory' do
+      Dir.mktmpdir do |dir|
+        src_dir = File.join(dir, 'src')
+        dest_dir = File.join(dir, 'dest')
+        src_subdir = File.join(src_dir, 'dir')
+        dest_subdir = File.join(dest_dir, 'dir')
+        FileUtils.mkdir_p(src_subdir)
+        FileUtils.mkdir_p(dest_subdir)
+        src_file = File.join(src_subdir, 'testfile')
+        dest_file = File.join(dest_subdir, 'testfile')
+        File.write(dest_file, 'contents from dest')
+        m = TildeMod.new(:test_name)
+        m.root_dir src_dir
+        m.install_dir dest_dir
+        m.directory 'dir'
+        TildeConfigSpec.suppress_output do
+          Refresh.refresh(m, should_prompt: false)
+        end
+        expect(File.read(src_file)).to eq('contents from dest')
+        expect(FileUtils.compare_file(src_file, dest_file)).to be_truthy
+      end
+    end
   end
 end
