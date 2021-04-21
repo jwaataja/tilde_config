@@ -11,8 +11,8 @@ module TildeMod
       #   either [yN] or [Yn] to the prompt dependening on the default
       #   response, preceded by a separating space
       # @return [Boolean] true if the user answered yes, false otherwise
-      def self.ask_yes_no(prompt, default_response: false,
-                          add_option_indicators: true)
+      def ask_yes_no(prompt, default_response: false,
+                     add_option_indicators: true)
         prompt += ' '
         if add_option_indicators
           prompt += default_response ? '[Yn] ' : '[yN] '
