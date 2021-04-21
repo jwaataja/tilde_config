@@ -40,6 +40,16 @@ module TildeConfig
       end
     end
 
+    # Gets the current value of the setting with name +setting_name+
+    # @param setting_name [Symbol] name of the setting
+    # @return [Object] current value of the setting, or nil if it
+    #   doesn't exist
+    def get_setting(setting_name)
+      return nil unless settings.key?(setting_name)
+
+      instance_variable_get("@#{setting_name}")
+    end
+
     def set_setting(setting_name, value)
       check_setting(setting_name)
       instance_variable_set("@#{setting}", value)

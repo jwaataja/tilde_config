@@ -42,6 +42,7 @@ module TildeConfig
     def self.with_empty_configuration(settings = {})
       old_configuration = instance
       self.instance = new
+      instance.set_settings(settings)
       begin
         yield
       ensure
