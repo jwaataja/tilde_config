@@ -147,35 +147,7 @@ module TildeConfig
     # want to update the locally stored version and copies it if the user says
     # "yes".
     def execute_refresh
-      files.each do |file|
-        src = src_path(file)
-        dest = dest_path(file)
-        unless File.exist?(src)
-          puts "Warning: #{src} does not exist"
-          next
-        end
-        unless File.file?(src)
-          puts "Warning: #{src} is not a regular file"
-          next
-        end
-        if File.symlink?(src)
-          puts "Warning: #{src} is a symlink, skipping"
-          next
-        end
-        unless File.exist?(dest)
-          puts "Warning: #{dest} does not exist, skipping"
-          next
-        end
-        unless File.file?(dest)
-          puts "Warning: #{dest} is not a regular file, skipping"
-          next
-        end
-        next if FileUtils.compare_file(src, dest)
 
-        proceed = ask_yes_no("Update #{src} in repository from #{dest}? [y/N] ")
-        puts "Copying #{dest} to #{src}"
-        FileUtils.cp(dest, src) if proceed
-      end
     end
 
     # Retrieves an array of this package's full set of dependencies, recursively
@@ -359,21 +331,6 @@ module TildeConfig
       #     Dir.delete(dir)
       #   end
       # end
-    end
-
-    # Make a repeating prompt for Y/n answer, with an empty answer defaulting to
-    # no.
-    # @param prompt [String] the prompt to display to the user
-    # @return [Boolean] true if the user answered yes, false otherwise
-    def ask_yes_no(prompt)
-      loop do
-        print prompt
-        res = $stdin.gets.chomp
-        return true if res.start_with?(/y/i)
-        return false if res.start_with?(/n/i) || res.strip.empty?
-
-        puts "Please answer 'y' or 'n'."
-      end
     end
 
     # Installs all package denpendencies. Prints a warning to the user if
