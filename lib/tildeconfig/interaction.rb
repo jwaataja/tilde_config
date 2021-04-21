@@ -2,9 +2,6 @@ module TildeMod
   # Methods for interacting with the user.
   module Interaction
     class << self
-      # TODO: Make the default a parameter. Add option to append the
-      # [y/N] prompt automatically.
-
       # Make a repeating prompt for y/n answer, with an empty answer defaulting
       # to no.
       # @param prompt [String] the prompt to display to the user
