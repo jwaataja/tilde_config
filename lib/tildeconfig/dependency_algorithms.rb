@@ -1,6 +1,7 @@
 module TildeConfig
   ##
   # Graph algorithms for managing dependencies.
+  # rubocop:disable Style/CombinableLoops
   module DependencyAlgorithms
     ##
     # Performs topological sort on the given graph, if possible. The
@@ -93,4 +94,5 @@ module TildeConfig
       graph
     end
   end
+  # rubocop:enable Style/CombinableLoops
 end
