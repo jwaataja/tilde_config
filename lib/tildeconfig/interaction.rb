@@ -5,7 +5,7 @@ module TildeConfig
   module Interaction
     class << self
       # Make a repeating prompt for y/n answer, with an empty answer defaulting
-      # to no.
+      # to +default_response+.
       # @param prompt [String] the prompt to display to the user
       # @param default_response [Boolean] the result to return if the
       #   user inputs the empty string
