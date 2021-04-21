@@ -231,6 +231,28 @@ module TildeConfig
       file_sym(src, dest)
     end
 
+    # Returns the full source path for the given +TildeFile+.
+    # @param file_tuple [TildeFile] file to expand source path of
+    # @return [String] the full source path for +file_tuple+
+    def src_path(file_tuple)
+      if File.absolute_path?(file_tuple.src)
+        file_tuple.src
+      else
+        File.join(@root_dir, file_tuple.src)
+      end
+    end
+
+    # Returns the full destination path for the given +TildeFile+.
+    # @param file_tuple [TildeFile] file to expand destination path of
+    # @return [String] the full destination path for +file_tuple+
+    def dest_path(file_tuple)
+      if File.absolute_path?(file_tuple.dest)
+        file_tuple.dest
+      else
+        File.join(@install_dir, file_tuple.dest)
+      end
+    end
+
     private
 
     # Shared behavior of the +file+ and +file_sym+ commands that differs
@@ -367,28 +389,6 @@ module TildeConfig
         return package
       end
       config.system_packages.fetch(package).name_for_system(system)
-    end
-
-    # Returns the full source path for the given +TildeFile+.
-    # @param file_tuple [TildeFile] file to expand source path of
-    # @return [String] the full source path for +file_tuple+
-    def src_path(file_tuple)
-      if File.absolute_path?(file_tuple.src)
-        file_tuple.src
-      else
-        File.join(@root_dir, file_tuple.src)
-      end
-    end
-
-    # Returns the full destination path for the given +TildeFile+.
-    # @param file_tuple [TildeFile] file to expand destination path of
-    # @return [String] the full destination path for +file_tuple+
-    def dest_path(file_tuple)
-      if File.absolute_path?(file_tuple.dest)
-        file_tuple.dest
-      else
-        File.join(@install_dir, file_tuple.dest)
-      end
     end
   end
 end

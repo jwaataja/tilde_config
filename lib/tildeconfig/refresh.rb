@@ -10,18 +10,16 @@ module TildeMod
     # file in the local repository
     def self.refresh(mod, should_prompt: true)
       mod.files.each do |file|
-        src = src_path(file)
-        dest = dest_path(file)
+        next if file.is_symlink
+
+        src = mod.src_path(file)
+        dest = mod.dest_path(file)
         unless File.exist?(src)
           puts "Warning: #{src} does not exist"
           next
         end
         unless File.file?(src)
           puts "Warning: #{src} is not a regular file"
-          next
-        end
-        if File.symlink?(src)
-          puts "Warning: #{src} is a symlink, skipping"
           next
         end
         unless File.exist?(dest)
