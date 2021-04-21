@@ -21,7 +21,7 @@ module TildeConfig
         end
         loop do
           print prompt
-          res = $stdin.gets.chomp
+          res = $stdin.gets.chomp.downcase
           return default_response if res.strip.empty?
           return true if res.start_with?(/y/i)
           return false if res.start_with?(/n/i)

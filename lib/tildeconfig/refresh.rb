@@ -71,7 +71,7 @@ module TildeConfig
             puts "Copying #{dest} to #{src}"
             FileUtils.cp(dest, src)
             return
-          when actions[:view]
+          when actions[:diff]
             view_file_diff(src, dest)
           when actions[:skip]
             return
