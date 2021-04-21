@@ -6,7 +6,11 @@ module TildeConfig
     # @return [Hash<Symbol, Object>] the collection of possible settings for a
     #   +Settings+ object. Keys are symbols representing setting names
     #   and values are the initial values for those settings.
-    @settings = {}
+    @defined_settings = {}
+
+    class << self
+      attr_reader :defined_settings
+    end
 
     # Defines a new setting for the +Settings+ class. Creates an
     # accessor with +name+. New instances of +Settings+ will have
@@ -16,7 +20,7 @@ module TildeConfig
     def self.define_setting(name, default_value = nil)
       attr_accessor name
 
-      @settings[name] = default_value
+      @defined_settings[name] = default_value
     end
 
     # @return [String, nil] the command to use for viewing diffs between
@@ -31,9 +35,9 @@ module TildeConfig
     # @param initial_settings [Hash<Symbol, Object>] map of setting
     #   names to values that override the initial values
     # @return [Settings] a new +Settings+
-    def initialize(initial_settings)
+    def initialize(initial_settings = {})
       check_setting_names(initial_settings)
-      self.class.settings.each do |setting, default_value|
+      self.class.defined_settings.each do |setting, default_value|
         value = default_value
         value = initial_settings[setting] if initial_settings.key?(setting)
         set_setting(setting, value)
@@ -45,14 +49,14 @@ module TildeConfig
     # @return [Object] current value of the setting, or nil if it
     #   doesn't exist
     def get_setting(setting_name)
-      return nil unless settings.key?(setting_name)
+      return nil unless self.class.defined_settings.key?(setting_name)
 
       instance_variable_get("@#{setting_name}")
     end
 
     def set_setting(setting_name, value)
-      check_setting(setting_name)
-      instance_variable_set("@#{setting}", value)
+      check_setting_name(setting_name)
+      instance_variable_set("@#{setting_name}", value)
     end
 
     # For any settings with names appearing as keys in
@@ -72,7 +76,7 @@ module TildeConfig
     # Raises an error if +setting_name+ is not a valid setting.
     # @param setting_name [Symbol] setting name to check
     def check_setting_name(setting_name)
-      return if @settings.key?(setting_name)
+      return if self.class.defined_settings.key?(setting_name)
 
       raise "Invalid setting: #{setting_name}"
     end

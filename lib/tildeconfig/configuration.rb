@@ -42,7 +42,7 @@ module TildeConfig
     def self.with_empty_configuration(settings = {})
       old_configuration = instance
       self.instance = new
-      instance.set_settings(settings)
+      instance.settings.set_settings(settings)
       begin
         yield
       ensure
@@ -53,10 +53,15 @@ module TildeConfig
     # Yields to the provided block with a temporary empty configuration. This
     # configuration will have standard library available. The global
     # configuration is reset to its original state afterward. Returns the result
-    # of the block.
-    def self.with_standard_library
+    # of the block. Can also pass initial settings for the
+    # configuration.
+    # @param settings [Hash<Symbol, Object>] map from symbols representing
+    #   setting names to values for that setting that the configuration will
+    #   have
+    def self.with_standard_library(settings = {})
       old_configuration = instance
       self.instance = new
+      instance.settings.set_settings(settings)
       define_standard_library
       begin
         yield
