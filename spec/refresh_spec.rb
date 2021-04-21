@@ -16,7 +16,9 @@ module TildeConfig
         m.root_dir src_dir
         m.install_dir dest_dir
         m.file 'testfile'
-        Refresh.refresh(m, should_prompt: false)
+        TildeConfigSpec.suppress_output do
+          Refresh.refresh(m, should_prompt: false)
+        end
         expect(FileUtils.compare_file(src_file, dest_file)).to be_truthy
       end
     end
