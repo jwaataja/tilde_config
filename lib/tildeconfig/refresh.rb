@@ -68,6 +68,44 @@ module TildeConfig
           false
         end
       end
+
+      def refresh_directory(src, dest, should_prompt)
+        return unless check_dest_exists(dest)
+
+        unless File.directory?(dest)
+          puts "Warning: #{dest} is not a directory, skipping"
+          return
+        end
+
+        src_entries = Dir.entries(src).sort
+        dest_entries = Dir.entries(dest).sort
+        src_entries.each do |entry|
+          src_path = File.join(src, entry)
+          dest_path = File.join(dest, entry)
+          next if File.symlink?(src_path)
+
+          if File.file?(src_path)
+            refresh_file(src_path, dest_path, should_prompt)
+          elsif File.directory?(src_path)
+            refresh_directory(src_path, dest_path, should_prompt)
+          end
+        end
+
+        dest_entries.difference(src_entries).each do |entry|
+          add_new_file(src, dest, entry, should_prompt)
+        end
+      end
+
+      def add_new_file(src_dir, dest_dir, entry_name, should_prompt)
+        if should_prompt && !Interaction.ask_yes_no(
+          "New file #{entry_name} in directory " \
+          "#{dest_dir}, copy into #{src_dir}? [y/N]"
+        )
+          return
+        end
+
+        FileUtils.cp_r(File.join(dest_dir, entry_name), src_dir)
+      end
     end
   end
 end
