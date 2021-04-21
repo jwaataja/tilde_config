@@ -50,13 +50,44 @@ module TildeConfig
 
         return if FileUtils.compare_file(src, dest)
 
-        proceed = !should_prompt || Interaction.ask_yes_no(
-          "Update #{src} in repository from #{dest}?"
-        )
-        return unless proceed
+        puts "Installed file #{dest} differed from local version #{src}"
+        loop do
+          actions = {
+            copy: 'Copy to local respository',
+            skip: 'Skip it',
+            diff: 'View differences'
+          }
+          response = actions[:copy]
+          if should_prompt
+            response = Interaction.ask_with_options(
+              'What would you like to do?',
+              [actions[:copy], actions[:skip], actions[:diff]],
+              actions[:skip]
+            )
+          end
 
-        puts "Copying #{dest} to #{src}"
-        FileUtils.cp(dest, src) if proceed
+          case response
+          when actions[:copy]
+            puts "Copying #{dest} to #{src}"
+            FileUtils.cp(dest, src) if proceed
+          when actions[:view]
+            view_file_diff(src, dest)
+          when actions[:skip]
+            return
+          end
+        end
+      end
+
+      def view_file_diff(src, dest)
+        if settings.diff_command.nil?
+          puts "'diff_command' setting not set"
+          return
+        end
+
+        command = settings.diff_command
+                          .gsub(/%a/, src)
+                          .gsub(/%b/, dest)
+        system(command)
       end
 
       # Checks if +dest+ exists and prints a prompt if not.

@@ -26,7 +26,7 @@ module TildeConfig
     # @return [String, nil] the command to use for viewing diffs between
     #   files. Should contain "%a" and "%b" which are substituted for
     #   the two file paths to diff.
-    define_setting :diff_command
+    define_setting :diff_command, 'diff -u %a %b | less'
 
     # Constructs a new +Settings+, with all settings initialized to
     # their initial values. Any settings appearing as keys in
