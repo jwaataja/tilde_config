@@ -1,4 +1,4 @@
-module TildeMod
+module TildeConfig
   # Methods for refreshing modules.
   module Refresh
     # Executes refresh action for this module. For each file that differs
