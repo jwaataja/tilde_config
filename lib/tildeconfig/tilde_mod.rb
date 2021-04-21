@@ -147,7 +147,7 @@ module TildeConfig
     # want to update the locally stored version and copies it if the user says
     # "yes".
     def execute_refresh
-
+      Refresh.refresh(self)
     end
 
     # Retrieves an array of this package's full set of dependencies, recursively
