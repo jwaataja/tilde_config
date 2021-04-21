@@ -21,7 +21,7 @@ module TildeConfig
         end
         loop do
           print prompt
-          res = $stdin.gets.chomp.downcase
+          res = $stdin.gets.chomp
           return default_response if res.strip.empty?
           return true if res.start_with?(/y/i)
           return false if res.start_with?(/n/i)
@@ -50,7 +50,7 @@ module TildeConfig
         prompt, prefixes = options_prompt(prompt, options, default_response)
         loop do
           print prompt
-          res = $stdin.gets.chomp
+          res = $stdin.gets.chomp.downcase
           selected = select_option(prefixes, default_response, res)
           return selected unless selected.nil?
 
