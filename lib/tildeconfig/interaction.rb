@@ -28,6 +28,20 @@ module TildeConfig
         end
       end
 
+      # Returns the prompt to be displayed to the user starting with +prompt+
+      # and containing options +options+. Computes the prefixes of each option
+      # that need to be matched in order to select that option, and the prefix
+      # appears bracketed in the option in the prompt. If +default_response+ is
+      # not nil, then that option is capitalized in the prompt. Also returns the
+      # map of prefixes
+      # @param prompt [String] prompt which appears at the start of the result
+      # @param options [Array<String>] the list of options to appear in the
+      #   prompt
+      # @param default_response [String, nil] the element of +options+ that
+      #   should be selected if the user enters an empty input, or nil if
+      #   there's no default option
+      # @return [Array] the generated prompt and a map from prefixes to the
+      #   option that would be selected by the prefix
       def options_prompt(prompt, options, default_response)
         result = prompt
         result << ' '
@@ -51,6 +65,22 @@ module TildeConfig
         [result, prefixes]
       end
 
+      # Asks the user to select between the options in +options+. Starts by
+      # printing +prompt+. Then, for each option in +options+, prints the option
+      # with some prefix bracketed. The prefix is the string the user must enter
+      # to select that option. Gets input from the user and if it starts with
+      # one of the option prefixes, returns that option. If the user doesn't
+      # enter valid input, repeatedly prompts them until they do.
+      #
+      # If +default_response+ is not nil, then it must equal one of the
+      # +options+. Then in the prompt, that option will be capitalized and if
+      # the user inputs an empty string, then +default_response+ will be
+      # returned.
+      # @param prompt [String] the prompt to print to the user
+      # @param options [Array<String>] the list of options, all lower-case
+      # @param default_response [String, nil] if not nil, the response that's
+      #   returned when the user inputs an empty string
+      # @return [String] the entire option the user selected
       def ask_with_options(prompt, options, default_response = nil)
         prompt, prefixes = options_prompt(prompt, options, default_response)
         loop do
