@@ -1,3 +1,5 @@
+require 'set'
+
 module TildeConfig
   # Methods for interacting with the user.
   module Interaction
@@ -25,6 +27,34 @@ module TildeConfig
           return false if res.start_with?(/n/i)
 
           puts "Please answer 'y' or 'n'."
+        end
+      end
+
+      # Asks the user to select between the options in +options+. Starts by
+      # printing +prompt+. Then, for each option in +options+, prints the option
+      # with some prefix bracketed. The prefix is the string the user must enter
+      # to select that option. Gets input from the user and if it starts with
+      # one of the option prefixes, returns that option. If the user doesn't
+      # enter valid input, repeatedly prompts them until they do.
+      #
+      # If +default_response+ is not nil, then it must equal one of the
+      # +options+. Then in the prompt, that option will be capitalized and if
+      # the user inputs an empty string, then +default_response+ will be
+      # returned.
+      # @param prompt [String] the prompt to print to the user
+      # @param options [Array<String>] the list of options, all lowercase
+      # @param default_response [String, nil] if not nil, the response that's
+      #   returned when the user inputs an empty string
+      # @return [String] the entire option the user selected
+      def ask_with_options(prompt, options, default_response = nil)
+        prompt, prefixes = options_prompt(prompt, options, default_response)
+        loop do
+          print prompt
+          res = $stdin.gets.chomp
+          selected = select_option(prefixes, default_response, res)
+          return selected unless selected.nil?
+
+          puts 'Please enter a valid response'
         end
       end
 
@@ -65,35 +95,37 @@ module TildeConfig
         [result, prefixes]
       end
 
-      # Asks the user to select between the options in +options+. Starts by
-      # printing +prompt+. Then, for each option in +options+, prints the option
-      # with some prefix bracketed. The prefix is the string the user must enter
-      # to select that option. Gets input from the user and if it starts with
-      # one of the option prefixes, returns that option. If the user doesn't
-      # enter valid input, repeatedly prompts them until they do.
-      #
-      # If +default_response+ is not nil, then it must equal one of the
-      # +options+. Then in the prompt, that option will be capitalized and if
-      # the user inputs an empty string, then +default_response+ will be
-      # returned.
-      # @param prompt [String] the prompt to print to the user
-      # @param options [Array<String>] the list of options, all lower-case
-      # @param default_response [String, nil] if not nil, the response that's
-      #   returned when the user inputs an empty string
-      # @return [String] the entire option the user selected
-      def ask_with_options(prompt, options, default_response = nil)
-        prompt, prefixes = options_prompt(prompt, options, default_response)
-        loop do
-          print prompt
-          res = $stdin.gets.chomp
-          return default_response if !default.response.nil? && res.strip.empty?
+      # Given a mapping of prefixes to options and an input, returns the option
+      # for any prefx that +input+ matches or nil if no prefix matches.
+      # If +default_response+ is not nil and +input+ is empty, returns
+      # +default_response+. If one of the prefixes is equal to its option, which
+      # will occur when one option is a prefix of another, then selecting that
+      # option requires input to equal it exactly.
+      # @param prefixes [Hash<String, String>] the prefix map from prefixes to
+      #   the option of the prefix
+      # @param default_response [String, nil] if not nil, then returns the
+      #   default response on an empty input
+      # @param input [String] the input to match prefixes against
+      # @return [String] the option for the prefix +input+ matches, or nil if no
+      #   prefix matches
+      def select_option(prefixes, default_response, input)
+        return default_response if !default_response.nil? && input.strip.empty?
 
-          prefixes.each do |prefix, option|
-            return option if res.start_with?(prefix)
-          end
+        prefix_options = Set.new
+        # rubocop:disable Style/CombinableLoops
+        prefixes.each do |prefix, option|
+          next unless prefix == option
+          return option if input == option
 
-          puts 'Please enter a valid response'
+          prefix_options << prefix
+          prefix_options << prefix
         end
+        prefixes.each do |prefix, option|
+          next if prefix_options.include?(prefix)
+          return option if input.start_with?(prefix)
+        end
+        # rubocop:enable Style/CombinableLoops
+        nil
       end
 
       private

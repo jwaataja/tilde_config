@@ -29,5 +29,29 @@ module TildeConfig
       expect(Interaction.options_prompt('prompt?', %w[aab aabcd], nil)[0])
         .to eq('prompt? [aab],[aabc]d: ')
     end
+
+    it 'selects basic options correctly' do
+      prefixes = { 'y' => 'yes', 'n' => 'no' }
+      expect(Interaction.select_option(prefixes, nil, 'y')).to eq('yes')
+      expect(Interaction.select_option(prefixes, nil, 'yes')).to eq('yes')
+      expect(Interaction.select_option(prefixes, nil, 'yy')).to eq('yes')
+      expect(Interaction.select_option(prefixes, nil, 'n')).to eq('no')
+      expect(Interaction.select_option(prefixes, nil, 'no')).to eq('no')
+      expect(Interaction.select_option(prefixes, nil, 'other')).to be_nil
+      expect(Interaction.select_option(prefixes, nil, '')).to be_nil
+    end
+
+    it 'selects the default option correctly' do
+      prefixes = { 'y' => 'yes', 'n' => 'no' }
+      expect(Interaction.select_option(prefixes, 'no', '')).to eq('no')
+      expect(Interaction.select_option(prefixes, 'no', ' ')).to eq('no')
+    end
+
+    it 'selects the correct option when one option is a prefix of another' do
+      prefixes = { 'ab' => 'ab', 'abc' => 'abcd' }
+      expect(Interaction.select_option(prefixes, nil, 'a')).to be_nil
+      expect(Interaction.select_option(prefixes, nil, 'ab')).to eq('ab')
+      expect(Interaction.select_option(prefixes, nil, 'abcd')).to eq('abcd')
+    end
   end
 end
