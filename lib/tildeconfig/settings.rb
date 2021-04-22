@@ -38,8 +38,11 @@ module TildeConfig
     def initialize(initial_settings = {})
       check_setting_names(initial_settings)
       self.class.defined_settings.each do |setting, default_value|
-        value = default_value
-        value = initial_settings[setting] if initial_settings.key?(setting)
+        value = if initial_settings.key?(setting)
+                  initial_settings[setting]
+                else
+                  default_value
+                end
         set_setting(setting, value)
       end
     end
