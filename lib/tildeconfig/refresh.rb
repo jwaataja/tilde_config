@@ -6,12 +6,13 @@ module TildeConfig
   # command.
   module Refresh
     class << self
-      # Executes refresh action for this module. For each file that differs
-      # between the installed version and version stored locally, asks the user
-      # if they want to update the locally stored version and copies it if the
-      # user says "yes".
+      # Executes refresh action for +mod+. For each file that differs
+      # between the installed version and version stored locally,
+      # prompts the user for an action. They may copy the installed
+      # version to the local repository, skip the file, or first view
+      # the differences with the +diff_command+ setting.
       # @param mod [TildeMod] the module to refresh
-      # @pararm should_prompt [Boolean] if true, ask the user before updating a
+      # @param should_prompt [Boolean] if true, ask the user before updating a
       #   file in the local repository
       def refresh(mod, should_prompt: true)
         mod.files.each do |file|
@@ -38,7 +39,7 @@ module TildeConfig
       # Refreshes a regular file.
       # @param src [String] path to source file
       # @param dest [String] path to dest file
-      # @pararm should_prompt [Boolean] if true, ask the user before updating a
+      # @param should_prompt [Boolean] if true, ask the user before updating a
       #   file in the local repository
       def refresh_file(src, dest, should_prompt)
         return unless check_dest_exists(dest)
@@ -79,6 +80,10 @@ module TildeConfig
         end
       end
 
+      # Shows the difference between +src+ and +dest+ using the
+      # +diff_command+ setting.
+      # @param src [String] source file
+      # @param dest [String] destination file
       def view_file_diff(src, dest)
         if settings.diff_command.nil?
           puts "'diff_command' setting not set"
@@ -103,6 +108,13 @@ module TildeConfig
         end
       end
 
+      # Refreshes a directory, recursively. Refreshes any files that
+      # differ between the two directories. For any file in +dest+ that
+      # doesn't exist in +src+, copies the version in dest into src.
+      # @param src [String] the source directory
+      # @param dest [String] the destination directory
+      # @param should_prompt [Boolean] if true, ask the user before updating a
+      #   file in the local repository
       def refresh_directory(src, dest, should_prompt)
         return unless check_dest_exists(dest)
 
@@ -132,6 +144,13 @@ module TildeConfig
         end
       end
 
+      # Adds a new file from +dest_dir+ to +source_dir+ with name
+      # +entry_name+.
+      # @param src_dir [String] source directory
+      # @param dest_dir [String] destination directory
+      # @param entry_name [String] name of an entry in +dest_dir+
+      # @param should_prompt [Boolean] if true, ask the user before updating a
+      #   file in the local repository
       def add_new_file(src_dir, dest_dir, entry_name, should_prompt)
         if should_prompt && !Interaction.ask_yes_no(
           "New file #{entry_name} in directory " \
