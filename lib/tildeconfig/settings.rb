@@ -57,6 +57,9 @@ module TildeConfig
       instance_variable_get("@#{setting_name}")
     end
 
+    # Sets the value of the setting with +setting_name+ to +value+
+    # @param setting_name [Symbol] name of a setting
+    # @param value [Object] value for the setting
     def set_setting(setting_name, value)
       check_setting_name(setting_name)
       instance_variable_set("@#{setting_name}", value)
@@ -70,9 +73,7 @@ module TildeConfig
     # rubocop:disable Naming/AccessorMethodName
     def set_settings(setting_values)
       check_setting_names(setting_values)
-      setting_values.each do |setting, value|
-        set_setting(setting, value)
-      end
+      setting_values.each { |setting, value| set_setting(setting, value) }
     end
     # rubocop:enable Naming/AccessorMethodName
 
