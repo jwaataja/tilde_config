@@ -78,3 +78,7 @@ def def_cmd(name)
   # The given block should take in (module, *other_args).
   TildeConfig::TildeMod.define_method(name, ->(*args) { yield(self, *args) })
 end
+
+def settings
+  TildeConfig::Configuration.instance.settings
+end

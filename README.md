@@ -252,6 +252,21 @@ mod :my_mod do |m|
 end
 ```
 
+### Refreshing
+
+Sometimes you modify the configuration files installed on your system, and want
+those changes to appear in the repository storing your files. One solution is to
+use symlinks, another is to periodically refresh the module. Refreshing a module
+examines all the installed files. For each file where the installed version
+differs from the stored version in the repository, it allows you to copy the
+installed version into the repository.
+
+To refresh a module or modules, just run
+```
+tildemod refresh my_module1 my_module2
+```
+If you don't specify any modules, then all modules are refreshed.
+
 ### Full Examples
 
 To run the examples, navigate into one of the subdirectories of the `examples`

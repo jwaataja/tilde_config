@@ -147,35 +147,7 @@ module TildeConfig
     # want to update the locally stored version and copies it if the user says
     # "yes".
     def execute_refresh
-      files.each do |file|
-        src = src_path(file)
-        dest = dest_path(file)
-        unless File.exist?(src)
-          puts "Warning: #{src} does not exist"
-          next
-        end
-        unless File.file?(src)
-          puts "Warning: #{src} is not a regular file"
-          next
-        end
-        if File.symlink?(src)
-          puts "Warning: #{src} is a symlink, skipping"
-          next
-        end
-        unless File.exist?(dest)
-          puts "Warning: #{dest} does not exist, skipping"
-          next
-        end
-        unless File.file?(dest)
-          puts "Warning: #{dest} is not a regular file, skipping"
-          next
-        end
-        next if FileUtils.compare_file(src, dest)
-
-        proceed = ask_yes_no("Update #{src} in repository from #{dest}? [y/N] ")
-        puts "Copying #{dest} to #{src}"
-        FileUtils.cp(dest, src) if proceed
-      end
+      Refresh.refresh(self)
     end
 
     # Retrieves an array of this package's full set of dependencies, recursively
@@ -257,6 +229,28 @@ module TildeConfig
     #   installed as
     def directory_sym(src, dest = nil)
       file_sym(src, dest)
+    end
+
+    # Returns the full source path for the given +TildeFile+.
+    # @param file_tuple [TildeFile] file to expand source path of
+    # @return [String] the full source path for +file_tuple+
+    def src_path(file_tuple)
+      if File.absolute_path?(file_tuple.src)
+        file_tuple.src
+      else
+        File.join(@root_dir, file_tuple.src)
+      end
+    end
+
+    # Returns the full destination path for the given +TildeFile+.
+    # @param file_tuple [TildeFile] file to expand destination path of
+    # @return [String] the full destination path for +file_tuple+
+    def dest_path(file_tuple)
+      if File.absolute_path?(file_tuple.dest)
+        file_tuple.dest
+      else
+        File.join(@install_dir, file_tuple.dest)
+      end
     end
 
     private
@@ -348,7 +342,7 @@ module TildeConfig
     # @param file_tuple [TildeFile] the file to uninstall
     def run_file_uninstall(file_tuple)
       dest = File.join(@install_dir, file_tuple.dest)
-      FileUtils.rm(dest) if ask_yes_no("Delete #{dest}? [y/N] ")
+      FileUtils.rm(dest) if ask_yes_no("Delete #{dest}?")
       # remove empty directories
       # dir = dest
       # loop do
@@ -359,21 +353,6 @@ module TildeConfig
       #     Dir.delete(dir)
       #   end
       # end
-    end
-
-    # Make a repeating prompt for Y/n answer, with an empty answer defaulting to
-    # no.
-    # @param prompt [String] the prompt to display to the user
-    # @return [Boolean] true if the user answered yes, false otherwise
-    def ask_yes_no(prompt)
-      loop do
-        print prompt
-        res = $stdin.gets.chomp
-        return true if res.start_with?(/y/i)
-        return false if res.start_with?(/n/i) || res.strip.empty?
-
-        puts "Please answer 'y' or 'n'."
-      end
     end
 
     # Installs all package denpendencies. Prints a warning to the user if
@@ -410,28 +389,6 @@ module TildeConfig
         return package
       end
       config.system_packages.fetch(package).name_for_system(system)
-    end
-
-    # Returns the full source path for the given +TildeFile+.
-    # @param file_tuple [TildeFile] file to expand source path of
-    # @return [String] the full source path for +file_tuple+
-    def src_path(file_tuple)
-      if File.absolute_path?(file_tuple.src)
-        file_tuple.src
-      else
-        File.join(@root_dir, file_tuple.src)
-      end
-    end
-
-    # Returns the full destination path for the given +TildeFile+.
-    # @param file_tuple [TildeFile] file to expand destination path of
-    # @return [String] the full destination path for +file_tuple+
-    def dest_path(file_tuple)
-      if File.absolute_path?(file_tuple.dest)
-        file_tuple.dest
-      else
-        File.join(@install_dir, file_tuple.dest)
-      end
     end
   end
 end
